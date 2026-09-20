@@ -1,0 +1,108 @@
+# 角色设计与后续优化注意事项
+
+## 核心原则
+
+这是一个可长期复用的 Character Model / Character Identity（角色视觉资产），不是一次性重新美化的生图任务。
+
+每次使用参考图进行修改或优化时，必须先遵守：
+
+> Do not redesign the character. Modify the existing image while preserving character identity, clothing, accessories and overall silhouette. The task is refinement, not regeneration.
+
+优化目标是提高自然度、材质表现和画面完成度，不是重新设计角色。除非明确要求，不得改变角色身份、脸部特征、发型、服装、配饰、整体轮廓或角色气质。
+
+## 身份锚点与角色设定
+
+- 角色为 20 岁成年女性，身高 165 cm。
+- 体态为匀称、健康的动漫比例曲线，略带性感但克制；禁止幼态、甜美化或过度性感化。
+- 皮肤偏白，保留自然细微纹理，避免塑料感、娃娃脸和过度磨皮。
+- 黑色齐腰长直发，有刘海；后脑勺饱满、高颅顶；发际线至眉毛的视觉比例约为 1:1。
+- 脸部轮廓、眼睛、瞳色、五官比例和整体气质必须以参考图为身份基准，优先保持原角色辨识度。
+- 角色气质为高冷、克制、有距离感；嘴角可略微勾起，体现外冷内俏皮的反差。
+
+## 五项硬性优化约束
+
+### 1. 脸部：最高优先级
+
+- 不要越改越像通用的 AI 美女。
+- 不得把角色改成标准网红脸、过度对称脸、娃娃脸或精致但失去个性的脸。
+- 优先保留参考图中的脸型、眼神、五官比例和辨识度；自然度提升不能牺牲身份锚点。
+
+### 2. 腰部：性感保留，但不能继续缩
+
+- 保留自然曲线和适度性感感。
+- 腰部不得继续收窄、夸张成沙漏型或不符合人体结构。
+- 目标是自然、健康、可信的腰胯比例；优化的是自然度，不是加强身材刺激。
+
+### 3. 胸部：自然包覆，不刻意建模
+
+- 胸部尺寸保持参考图设定，不主动放大或缩小。
+- 服装应自然包覆身体，形成真实布料张力和褶皱。
+- 不要刻意突出胸部轮廓、乳沟、局部高光或 AI 建模痕迹。
+- 这不是去性感，而是避免胸部成为不自然的视觉焦点。
+
+### 4. 手部：避免明显生成痕迹
+
+- 左手禁止插兜。
+- 左手优先自然垂下，或轻触外套边缘、衣摆或口袋外侧。
+- 右手可以轻抬或置于镜头可见处，用于展示手串，但动作必须自然。
+- 手指、手腕、珠串和服装接触关系必须符合真实结构；禁止多指、粘连、扭曲或穿模。
+
+### 5. 脚部：硬性构图约束
+
+- 两只靴子必须完整出现。
+- 鞋底下方必须保留明确留白，禁止裁脚、贴边或让鞋底贴到画面底部。
+- 宁愿人物在画面中小一点，也不要牺牲完整脚部和构图安全区。
+- 生成全身图时，必须预留头顶、左右身体和鞋底下方的安全边距。
+
+## 服装与道具保持不变
+
+- 完整保留参考图中的原服装设计、主色、层次和剪裁；不得自行改款。
+- 服装基调为街头风、有网感、略微性感但克制。
+- 保持深色短款高领内搭、深色长裤、卡其/灰绿色敞开式外套。
+- 右手手腕佩戴银曜石珠串：深色黑曜石自然光泽，不能生成金属珠；中间串有一枚银质戒指。
+- 颈部佩戴约 1×5 cm 的白水晶灵摆：半透明、有真实反光、不发光、不产生魔法特效。
+- 右侧裤袋露出一部分老式翻盖手机，类似早期诺基亚风格；不得替换成现代智能手机。
+- 左侧外套口袋放置约 2×6 cm 的深褐色小盒：四面为坚韧卡其布包裹，底部触摸屏视觉上伪装成铁质；盒内丝绒布和碎白水晶不可见。
+- 不得新增武器、首饰、手机、魔法效果或其他未设定道具。
+
+## 构图、动作与镜头
+
+- 优先使用全身或 3/4 身构图，确保服装、口袋道具、手部和双脚完整可见。
+- 可使用平视或轻微低机位，但不得造成身体比例夸张。
+- 角色可以轻微侧身、略微靠近镜头或直视镜头；动作要大胆但自然，禁止卖萌、吐舌、夸张媚态或挑逗动作。
+- 夜景可使用冷色环境光和细微霓虹反射；日常场景可使用阴天柔光；角色海报可使用干净深灰背景。
+- 任何镜头变化都不能破坏角色身份、服装、整体轮廓和五项硬性约束。
+
+## 多轮对话优化流程
+
+生成第一版后，不要直接结束。每次继续优化时，建议明确告诉模型：
+
+> 不要因为优化而改变角色。优化的是自然度，不是角色设计。
+
+每一轮优先检查以下顺序：
+
+1. 脸部是否仍然像原角色，而不是通用 AI 美女。
+2. 腰部是否保持自然曲线，没有继续缩窄。
+3. 胸部尺寸是否保持，衣服是否自然包覆，没有刻意建模细节。
+4. 左手是否自然垂下或轻触外套，绝不插兜。
+5. 两只靴子是否完整出现，鞋底下方是否有留白。
+
+如果某次优化破坏了以上任一项，应回退到上一张稳定参考图，而不是继续在错误结果上叠加修改。
+
+## 主提示词（中文）
+
+以参考图中的成年女性动漫角色为唯一角色与服装参考，生成接近真人的高质量 3D 角色全身渲染。严格保留角色身份、脸部辨识度、发型、原服装、配饰、道具和整体轮廓；这是对现有图像的自然度优化，不是重新设计角色。20 岁，身高 165 cm，匀称健康的动漫比例曲线，性感保留但克制，腰部自然不能继续缩窄，胸部尺寸保持并由衣服自然包覆。偏白、白皙光洁的皮肤，保留细微自然皮肤纹理。黑色齐腰长直发，有刘海，后脑勺饱满，高颅顶，发际线到眉毛的视觉比例约为 1:1。面部轮廓、瞳色、发型与人物气质严格参考原图，保持原角色辨识度，避免通用 AI 美女脸。
+
+完整保留参考图的原服装设计、主色、层次与剪裁：深色短款高领内搭、深色长裤、卡其/灰绿色敞开式外套；街头风，有网感，略微性感但克制，禁止自行改款。角色外形高冷、克制、有距离感，眼神冷静直视镜头，嘴角略微勾起；呈现外冷内俏皮的反差。姿态大胆但自然：身体轻微侧身并略靠近镜头，右手轻抬或自然置于镜头可见处以展示手串，左手自然垂下或轻触外套边缘，绝不插兜。全身构图必须完整包含两只靴子，并在鞋底下方保留留白，宁愿人物略小也不要裁脚。
+
+右手手腕缠绕银曜石珠串：深色黑曜石基底、自然银色虹彩光泽，绝不是金属珠，中间串着一枚银质戒指。颈部佩戴 1×5 cm 白水晶灵摆，半透明、有真实反光、不发光。右侧裤子口袋露出一部分老式翻盖手机，绝不是现代智能手机。左侧外套口袋放置一个约 2×6 cm 的深褐色小盒：四面是坚韧的卡其布包裹材质，底部触摸屏有玻璃手感但外观伪装为铁质；盒内有丝绒布和碎白水晶，但碎白水晶不可见。
+
+near-realistic 3D character render, stylized realism, cinematic street-fashion character design, PBR materials, realistic hair strands, subtle pale skin texture, realistic fabric folds, natural body proportions, high-detail accessories, cool-toned cinematic lighting, soft rim light, natural reflections, physically based rendering, sharp focus, full body, 3/4 view, complete boots with empty space below soles, clean urban background, Unreal Engine quality, high fidelity, no magic effects.
+
+## 负面提示词
+
+anime flat illustration, manga, cel shading, chibi, childlike, generic AI beauty face, influencer face, doll face, overly symmetrical face, identity drift, redesigned character, changed face, changed hairstyle, changed outfit, changed silhouette, over-tight waist, exaggerated hourglass body, enlarged breasts, emphasized cleavage, artificial breast modeling, plastic skin, overly smooth skin, excessive sexualization, seductive pose, left hand in pocket, cropped feet, cut-off boots, boots touching bottom edge, no space below shoes, bad hands, extra fingers, fused fingers, distorted anatomy, metallic obsidian beads, extra jewelry, extra weapon, magic glow, magical effects, glowing crystal, modern smartphone, touchscreen phone visible as a smartphone, missing bracelet, missing pendulum, missing flip phone, missing box, visible white crystal shards, blurry, low detail, watermark, text, logo
+
+## 稳定补强句
+
+Do not redesign the character. Preserve the face identity, clothing, accessories, silhouette and overall proportions from the reference image. Refine realism only. Keep the waist natural and do not shrink it. Keep the chest size unchanged and let the clothing wrap naturally without emphasizing breast details. The left hand must stay outside the pocket, naturally down or lightly touching the coat edge. Show both boots completely with visible empty space below the soles. If necessary, scale the character smaller in frame to protect the feet and preserve the full-body composition.

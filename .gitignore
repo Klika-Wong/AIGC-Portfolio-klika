@@ -1,0 +1,27 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+
+# Generated exports and temporary files
+dist/
+build/
+tmp/
+temp/
+*.tmp
+*.bak
+*.log
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Python cache, if helper scripts are added later
+__pycache__/
+*.py[cod]

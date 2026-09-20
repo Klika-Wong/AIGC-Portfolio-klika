@@ -1,0 +1,26 @@
+# 动漫参考图 → 接近真人 3D 角色设计提示词
+
+## 使用说明
+1. 将 `人物设定-1\主要形象.jpg` 上传为角色与服装参考图。
+2. 建议使用全身或 3/4 身构图，确保裤袋、外套口袋和右手道具可见。
+3. 这是“高质量近真人 3D 渲染”提示词，不是纯真人摄影提示词；生成时保持角色原图的服装设计与识别度。
+
+## 主提示词（中文）
+以参考图中的成年女性动漫角色为唯一角色与服装参考，生成接近真人的高质量 3D 角色全身渲染。20岁，身高165cm，匀称健康的动漫比例曲线，偏白、白皙光洁的皮肤，保留细微自然皮肤纹理。黑色齐腰长直发，有刘海，后脑勺饱满，高颅顶，发际线到眉毛的视觉比例约为1:1。面部轮廓、瞳色、发型与人物气质严格参考原图，并转化为自然、成熟、可辨识的近真人3D面部结构。
+
+完整保留参考图的原服装设计、主色、层次与剪裁：深色短款高领内搭、深色长裤、卡其/灰绿色敞开式外套；街头风，有网感，略微性感但克制，禁止自行改款。角色外形高冷、克制、有距离感，眼神冷静直视镜头，嘴角略微勾起；正处于执行任务或活动中，呈现外冷内俏皮的反差。姿态大胆但自然：身体轻微侧身并略靠近镜头，右手轻抬或自然置于镜头可见处以展示手串，不使用卖萌或挑逗性动作。
+
+右手手腕缠绕银曜石珠串：深色黑曜石基底、自然银色虹彩光泽，绝不是金属珠，中间串着一枚银质戒指。颈部佩戴1×5cm白水晶灵摆，半透明、有真实反光、不发光。右侧裤子口袋露出一部分老式诺基亚风格翻盖手机，清晰可见、绝不是现代智能手机。左侧外套口袋放置一个约2×6cm的深褐色小盒：四面是坚韧的卡其布包裹材质，底部触摸屏有玻璃手感但外观伪装为铁质；盒内有丝绒布和碎白水晶，但碎白水晶不可见。
+
+near-realistic 3D character render, stylized realism, cinematic street-fashion character design, PBR materials, realistic hair strands, subtle pale skin texture, realistic fabric folds, high-detail accessories, cool-toned cinematic lighting, soft rim light, natural reflections, physically based rendering, sharp focus, shallow depth of field, full body, 3/4 view, clean urban background, Unreal Engine quality, high fidelity, no magic effects.
+
+## 负面提示词
+anime flat illustration, manga, cel shading, chibi, childlike, sweet cute expression, tongue out, excessive sexualization, exaggerated cleavage, seductive pose, plastic skin, doll face, overly smooth skin, metallic obsidian beads, extra jewelry, extra weapon, magic glow, magical effects, glowing crystal, modern smartphone, touchscreen phone visible as a smartphone, changed outfit, dress, school uniform, altered hairstyle, short hair, missing bracelet, missing pendulum, missing flip phone, missing box, visible white crystal shards, distorted anatomy, bad hands, extra fingers, blurry, low detail, watermark, text, logo
+
+## 更稳的道具补强句（如模型容易漏细节，可追加）
+全身构图，右手手腕、右侧裤子口袋与左侧外套口袋必须全部清晰可见；右手为银曜石珠串与一枚串在珠间的银质戒指，右裤袋为露出一部分的老式翻盖手机，左外套口袋为深褐色卡其布包裹的小盒，白水晶灵摆悬挂于颈部。不要省略、替换或新增这些道具。
+
+## 可选镜头版本
+- 任务感：夜间城市街头，冷色环境光与细微霓虹反射，角色侧身回望镜头，左手轻扶外套，右手手串清晰可见。
+- 日常活动感：简洁城市步道，阴天柔光，角色向镜头走近，表情冷淡但嘴角微扬，外套自然敞开。
+- 角色海报感：干净深灰背景，低机位全身站姿，左右口袋道具与灵摆完整展示，重点强调服装和材质细节。
