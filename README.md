@@ -1,48 +1,25 @@
-# AIGC Character Portfolio
+# AIGC 项目集合
 
-A personal portfolio for AI-generated character visual assets, character sheets, prompt design, and iteration notes.
+这是个人 AIGC 创作与研究仓库，用于保存不同项目的设定、提示词、参考素材、生成结果和迭代记录。
 
-## Contents
+## 项目
 
-- `人物设定-1/`: character references, key images, extracted asset parts, and the character profile
-- `角色设计提示词参考.txt`: identity-preservation rules, composition constraints, props, and refinement prompts
-- `注意事项/`: archived prompt notes and editing guidance
-- `人物设定-2/`: reserved for a future character or version
+- [`项目-01-角色视觉资产`](项目-01-角色视觉资产/)：近真人 3D 角色视觉资产与提示词规范。
+- `项目-02-预留/`：未来项目位置。
+- `项目-03-预留/`：未来项目位置。
 
-## Character 1
+## 使用与权利说明
 
-The first character is an adult woman, 20 years old and 165 cm tall. Her visual direction is cool, restrained, and distant, with a subtle contrast between an outwardly composed attitude and a slightly playful confidence.
+本仓库记录的是 AI 辅助创作过程，不代表所有 AI 输出在任何法域都自动享有完整著作权。作者对角色设定、提示词设计、参考选择、构图要求、筛选、修改、编排和文档整理等人类创作部分保留相应权利；具体保护范围取决于适用法律和实际创作贡献。
 
-### Visual anchors
+AI 工具不被声明为作者或发明人。任何专利、著作权、商标或商业使用判断，都应根据具体法域、工具许可和素材来源单独确认；本仓库说明不构成法律意见。
 
-- Waist-length straight black hair with bangs
-- Khaki or grey-green open jacket, dark inner top, and dark trousers
-- Black obsidian bead bracelet with a silver ring
-- White crystal pendulum necklace
-- Vintage flip phone partly visible in the right trouser pocket
-- Small dark-brown box in the left jacket pocket
+未经作者书面许可，不得复制、再分发、用于商业发布、数据集训练、模型微调、冒名归属或制作衍生作品。第三方素材、模型、字体、平台输出和参考图仍受其原有许可或权利约束。
 
-### Generation principle
+## 隐私与安全
 
-The core rule is to refine the existing character rather than redesign her. Every iteration should preserve facial identity, clothing structure, prop relationships, and overall silhouette before improving materials, anatomy, hand structure, and composition.
+- 本仓库不包含个人记忆文档、密码、API Key、Token、Cookie、授权头或其他凭据。
+- 发布前应检查图片元数据、生成平台链接、第三方人物/商标/角色以及文件历史。
+- 本仓库默认按私有仓库管理；公开前应重新确认素材授权和商业风险。
+- 本地 `记忆` 目录中的项目理解文档不属于本仓库，也不应上传。
 
-See [`角色设计提示词参考.txt`](角色设计提示词参考.txt) for the detailed constraints.
-
-## Asset notes
-
-The images are visual references and separated asset parts. The text files document character identity, prompt constraints, and reusable iteration rules for future image-generation workflows.
-
-## Suggested workflow
-
-1. Read [`人物设定-1/人物形象.txt`](人物设定-1/人物形象.txt).
-2. Use [`人物设定-1/主要形象.jpg`](人物设定-1/主要形象.jpg) as the primary identity reference.
-3. Combine the reference image with [`角色设计提示词参考.txt`](角色设计提示词参考.txt).
-4. Review facial identity, body proportions, clothing coverage, hands, and complete footwear after each iteration.
-
-## Rights and use
-
-The text and images in this repository are personal creative assets. Please do not use them for commercial publication, dataset training, redistribution, or false attribution without the author's permission.
-
-## Status
-
-This portfolio is a work in progress. Future updates may add character 2, version comparisons, generation parameters, and final presentation pieces.

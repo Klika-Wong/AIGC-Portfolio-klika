@@ -21,6 +21,15 @@ temp/
 .env
 .env.*
 !.env.example
+记忆/
+**/记忆/
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
 
 # Python cache, if helper scripts are added later
 __pycache__/
