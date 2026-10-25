@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>原创角色 · 轻吐槽气泡预览 v0.1</title>
+<style>
+:root{font-family:system-ui,"Microsoft YaHei",sans-serif;color:#232d32;background:#e8e9e6}*{box-sizing:border-box}body{margin:0;padding:18px}
+.layout{display:grid;grid-template-columns:minmax(250px,500px) minmax(240px,360px);gap:18px;max-width:950px;margin:auto}
+.stage{height:min(78vh,790px);min-height:480px;position:relative;border:1px solid #c7cbc7;border-radius:22px;overflow:hidden;background:linear-gradient(#f7f7f3,#d7dcd7)}
+figure{margin:0;height:100%;display:flex;justify-content:center;align-items:flex-end}figure img{height:96%;max-width:100%;object-fit:contain;object-position:bottom}
+.bubble{position:absolute;right:5%;top:12%;max-width:53%;padding:12px 16px;border:1px solid #d8d5c9;background:#fffefaef;color:#404b48;border-radius:18px 18px 4px 18px;box-shadow:0 8px 25px #2223;font-size:clamp(13px,1.8vw,16px);line-height:1.5;opacity:0;transform:translateY(8px) scale(.96);transition:opacity .23s,transform .23s;pointer-events:none}
+.bubble.visible{opacity:1;transform:none}.bubble:after{content:"";position:absolute;right:10px;bottom:-11px;border-left:10px solid transparent;border-top:12px solid #fffefaef}
+.panel{background:#fafaf7;border-radius:20px;padding:20px;box-shadow:0 4px 18px #0001}.panel h1{font-size:20px;margin:0 0 8px}.muted{color:#62706c;font-size:13px;line-height:1.7}button{border:1px solid #abb8af;border-radius:10px;background:white;color:#24322d;padding:10px 12px;cursor:pointer;margin:4px 3px 4px 0}button:hover{background:#e4e9e4}button:focus-visible,input:focus-visible{outline:3px solid #608a8a}button.primary{background:#344c42;color:white}label{display:block;margin:12px 0}output{display:block;padding:11px;background:#e6eae5;border-radius:8px;font-size:13px;min-height:54px;white-space:pre-wrap}.chip{display:inline-block;background:#e1e7e1;border-radius:14px;font-size:12px;padding:3px 9px}.stage-note{position:absolute;bottom:8px;left:10px;font-size:11px;background:#ffffffc7;padding:5px 8px;border-radius:7px}@media(max-width:740px){.layout{grid-template-columns:1fr}.stage{height:62vh;min-height:420px}.bubble{top:8%;right:3%}}@media(prefers-reduced-motion:reduce){.bubble{transition:none}}
+</style></head><body><main class="layout">
+<section class="stage" aria-label="原创角色和气泡效果预览"><figure><img src="../../人物设定-1/主要形象.jpg" alt="AIGC 仓库中的原始角色参考图（仅用于演示叠加层）"></figure>
+<div id="bubble" class="bubble" role="status" aria-live="off"></div><div class="stage-note">原始角色图片 · 独立气泡层（非 Live2D 绑定）</div></section>
+<section class="panel"><h1>轻吐槽 · 内心 OS</h1><span class="chip">v0.2 交互模拟</span>
+<p class="muted">真正的 AI 会自行判断是否生成 aside。这里仅用两种模拟输出检查展示效果，不接入模型。</p>
+<label><input id="enabled" type="checkbox" checked> 允许内心气泡</label>
+<label><input id="serious" type="checkbox"> 严肃 / 隐私模式</label>
+<p><button class="primary" id="aside">模拟：模型决定轻吐槽</button><button id="silent">模拟：模型正常回答</button><button id="hide">关闭气泡</button></p>
+<output id="log" aria-live="polite">等待模拟模型输出。</output>
+</section></main>
+<script>
+"use strict";
+const bubble=document.getElementById("bubble"), log=document.getElementById("log"), enabled=document.getElementById("enabled"),serious=document.getElementById("serious");
+let timer=0,previousAside=false;
+function hide(){clearTimeout(timer);bubble.classList.remove("visible");}
+function renderAgentResponse(result){
+  hide();
+  if(!result||typeof result.reply!=="string")return;
+  log.textContent="模型回答："+result.reply;
+  if(!enabled.checked||serious.checked||!result.aside||typeof result.aside.text!=="string"){previousAside=false;return;}
+  const text=result.aside.text.trim();
+  if(!text||text.length>24||previousAside){previousAside=false;return;}
+  bubble.textContent=text;
+  bubble.classList.add("visible");previousAside=true;
+  timer=setTimeout(hide,2600);
+}
+document.getElementById("aside").onclick=()=>renderAgentResponse({reply:"这次已经整理好了。",aside:{text:"差点以为还有第八版……",expression:"tease_smile"}});
+document.getElementById("silent").onclick=()=>renderAgentResponse({reply:"资料已经整理好了。",aside:null});
+document.getElementById("hide").onclick=hide;
+enabled.onchange=()=>{if(!enabled.checked)hide();};
+serious.onchange=()=>{if(serious.checked)hide();};
+window.addEventListener("avatar:response",e=>renderAgentResponse(e.detail));
+window.addEventListener("pagehide",hide);
+</script></body></html>

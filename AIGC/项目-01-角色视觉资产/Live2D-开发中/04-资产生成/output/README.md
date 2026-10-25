@@ -1,0 +1,1 @@
+# 原始人设 Live2D 透明分区素材 v0.3\n\n以原始人设图制作，不重绘、不换脸、不换发型。\n\n- 00_subject_cutout.png：透明人物主体（需修发丝和边缘）\n- layers/*.png：24 个真实透明 RGBA 分区候选，不是最终可绑定部件\n- 01_parts_inventory.png：部件预览\n- 02_editable_reference.ora：Krita/GIMP 可打开的分层文件，候选层默认隐藏；可转 PSD\n- manifest.json：分区边界和质量说明\n\n**现阶段不能直接导出 .moc3**：没有补画遮挡区域，眼和口缺乏闭合形态，需要在 Cubism 中完成网格、变形器、绑定、物理模拟和导出。\n

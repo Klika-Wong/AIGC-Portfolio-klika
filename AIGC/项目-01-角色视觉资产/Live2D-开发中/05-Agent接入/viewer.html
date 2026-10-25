@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Klika · AI Avatar Bridge</title>
+<style>
+:root{font:14px/1.55 system-ui,"Microsoft YaHei",sans-serif;color:#e9e9e2;background:#1d2323}
+*{box-sizing:border-box}body{margin:0}.layout{display:grid;grid-template-columns:minmax(0,580px) minmax(230px,345px);gap:24px;max-width:980px;margin:20px auto;padding:0 16px}
+.stage{height:min(88vh,780px);min-height:460px;background:radial-gradient(ellipse at 51% 38%,#656e6b,#303a3b 72%,#1f2525);border-radius:22px;position:relative;overflow:hidden;border:1px solid #54625b}
+#portrait,#modelCanvas{width:100%;height:100%;position:absolute;inset:0;display:block}#portrait{object-fit:contain;object-position:center bottom;animation:breathe 6s ease-in-out infinite}#modelCanvas{display:none;pointer-events:none}
+@keyframes breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.aside{position:absolute;top:12%;right:5%;max-width:50%;padding:11px 16px;border-radius:18px 18px 3px 18px;background:#f3f1eaf5;color:#37463e;box-shadow:0 8px 26px #0004;font-size:15px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;overflow-wrap:anywhere}
+.aside.show{opacity:1;transform:translateY(0)}.aside:after{content:"";position:absolute;bottom:-9px;right:7px;border-left:11px solid transparent;border-top:11px solid #f3f1eaf5}
+.speech{position:absolute;bottom:12px;left:12px;right:12px;text-align:center;background:#121b1dbe;border:1px solid #67716c73;border-radius:12px;padding:9px 11px;font-size:15px;min-height:43px}
+.status{position:absolute;top:10px;left:10px;background:#172523cc;border-radius:9px;padding:4px 9px;font-size:12px;color:#c5d7ca}
+aside{align-self:start;background:#283130;border:1px solid #52605a;border-radius:18px;padding:20px}
+h1{font-size:20px;margin:0 0 5px}p{color:#b9c3bb}.hint{font-size:12px;color:#b7c1bb}button{border:1px solid #60756b;background:#3f594b;color:#fafafa;border-radius:9px;padding:10px 13px;cursor:pointer;margin:5px 6px 5px 0}button:hover{background:#4e6d59}label{display:block;margin:14px 0}code{color:#e4d5a9}textarea{width:100%;min-height:80px;resize:vertical;padding:10px;background:#1d2525;color:#f3f3ed;border:1px solid #5c6e62;border-radius:9px;font:inherit}output{display:block;color:#bbcbbe;white-space:pre-wrap;overflow-wrap:anywhere;background:#1d2525;padding:12px;border-radius:9px;min-height:72px}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.stage{height:68vh;min-height:420px}.aside{max-width:60%}}@media(prefers-reduced-motion:reduce){#portrait{animation:none}.aside{transition:none}}
+</style></head><body>
+<main class="layout">
+<section class="stage" id="stage" aria-label="原创数字人窗口">
+<img id="portrait" src="/assets/00_subject_cutout.png" alt="来自原始人设图的透明角色；非已绑定 Live2D 模型">
+<canvas id="modelCanvas"></canvas>
+<div id="status" class="status">正在连接...</div>
+<div id="aside" class="aside" role="status" aria-live="off"></div>
+<div id="speech" class="speech">你好，我在这里。</div>
+</section>
+<aside><h1>Klika · AI 数字人</h1><p class="hint">已具备本地助手事件桥接；没有 .model3.json 时显示原图透明人物，不能把它当作真实 Cubism 模型。</p>
+<label><input type="checkbox" id="allowAside" checked> 允许偶发内心气泡（由模型决定）</label>
+<label><input type="checkbox" id="serious"> 严肃 / 隐私模式</label>
+<button id="normal">演示普通回答</button><button id="tease">演示轻吐槽</button><button id="dismiss">隐藏气泡</button>
+<p class="hint">想直接聊天：在本机设置 DEEPSEEK_API_KEY 后使用下方输入框（每次请求会使用你的 DeepSeek API 额度）。</p><textarea id="chatInput" maxlength="2000" placeholder="和她说点什么……"></textarea><button id="sendChat">发送给 AI</button><p>其他 Agent 接入方式：向本机的 <code>POST /api/events</code> 发送 <code>reply</code> 和可选 <code>aside</code>。具体字段见仓库 README。</p>
+<output id="log">等待连接</output>
+</aside></main>
+<script>
+"use strict";
+const stage=document.getElementById("stage"),portrait=document.getElementById("portrait"),canvas=document.getElementById("modelCanvas");
+const speech=document.getElementById("speech"),bubble=document.getElementById("aside"),log=document.getElementById("log");
+const statusNode=document.getElementById("status"),enabled=document.getElementById("allowAside"),serious=document.getElementById("serious");
+let timer=null,model=null,app=null,lastAside=false,level=0,retry=1000;
+function hideAside(){if(timer)clearTimeout(timer);bubble.classList.remove("show");timer=null}
+function showAside(text){
+ if(!enabled.checked||serious.checked||lastAside)return;
+ if(typeof text!=="string"||!text.trim()||text.length>24)return;
+ bubble.textContent=text;
+ bubble.classList.add("show");
+ lastAside=true;timer=setTimeout(hideAside,2600)
+}
+function applyExpression(name){
+ if(!model||!name||name==="neutral")return;
+ try{model.expression(name)}catch(_e){/* Model may not have this exp3 expression */ }
+}
+function handleEvent(e){
+ if(!e||typeof e!=="object")return;
+ if(e.type==="avatar.audio_level"){level=Math.max(0,Math.min(1,Number(e.audio_level)||0));return}
+ if(e.type!=="assistant.reply"&&e.type!=="avatar.state")return;
+ if(typeof e.reply==="string"&&e.reply.trim())speech.textContent=e.reply.slice(0,4000);
+ if(e.context_safety&&e.context_safety!=="normal"){hideAside();lastAside=false;return}
+ if(e.aside&&typeof e.aside.text==="string"&&enabled.checked&&!serious.checked){
+   showAside(e.aside.text);
+   if(bubble.classList.contains("show"))applyExpression(e.aside.expression||e.expression);
+ }else{hideAside();lastAside=false;applyExpression(e.expression)}
+ log.textContent="收到事件："+e.type+(e.aside?"（含可选气泡）":"（无气泡）");
+}
+function wsConnect(){
+ const proto=location.protocol==="https:"?"wss:":"ws:";
+ const ws=new WebSocket(proto+"//"+location.host+"/ws");
+ ws.onopen=()=>{statusNode.textContent=(model?"Cubism 已加载":"原图预览")+" · 已连接";retry=1000};
+ ws.onmessage=event=>{try{handleEvent(JSON.parse(event.data))}catch(_e){log.textContent="收到无效事件"}};
+ ws.onclose=()=>{statusNode.textContent="连接中断，重试中";setTimeout(wsConnect,retry);retry=Math.min(retry*2,8000)};
+}
+function script(src){
+ return new Promise((resolve,reject)=>{const e=document.createElement("script");e.src=src;e.onload=resolve;e.onerror=()=>reject(new Error("failed to load "+src));document.head.appendChild(e)})
+}
+async function loadLive2D(url){
+ // Cubism Core is licensed by Live2D; user installs the official SDK file locally.
+ await script("https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js");
+ await script("/vendor/live2dcubismcore.min.js");
+ await script("https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js");
+ if(!window.PIXI?.live2d?.Live2DModel)throw Error("Cubism JS library missing");
+ app=new PIXI.Application({view:canvas,resizeTo:stage,transparent:true,antialias:true});
+ model=await PIXI.live2d.Live2DModel.from(url);
+ app.stage.addChild(model);
+ function resize(){
+    const b=model.getLocalBounds();
+    const factor=Math.min(stage.clientWidth/Math.max(b.width,1),stage.clientHeight/Math.max(b.height,1))*.91;
+    model.scale.set(factor);model.anchor.set(.5,.5);
+    model.x=stage.clientWidth/2;model.y=stage.clientHeight/2;
+ }
+ resize();window.addEventListener("resize",resize);
+ app.ticker.add(()=>{if(!model)return;
+    try{model.internalModel.coreModel.setParameterValueById("ParamMouthOpenY",level)}catch(_e){}
+ });
+ canvas.style.display="block";portrait.style.display="none";
+ statusNode.textContent="Cubism 已加载";
+}
+async function init(){
+ try{
+  const state=await (await fetch("/api/status")).json();
+  if(!state.parts_available){portrait.style.display="none";log.textContent="没有检测到透明人物素材，请先生成资产。"}
+  if(state.model_url){try{await loadLive2D(state.model_url)}catch(e){log.textContent="Live2D 模型未能加载，使用原图预览："+e.message}}
+  else{statusNode.textContent="原图预览（尚未绑定 Cubism）"}
+  if(state.deepseek_ready){log.textContent="DeepSeek 已配置，可以直接聊天。"}
+ }catch(e){log.textContent="服务端状态读取失败："+e.message}
+ wsConnect();
+}
+document.getElementById("sendChat").onclick=async()=>{
+ const input=document.getElementById("chatInput"), message=input.value.trim();
+ if(!message)return;
+ const send=document.getElementById("sendChat");
+ send.disabled=true;log.textContent="正在请求 DeepSeek...";
+ try{
+   const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message,allow_aside:enabled.checked,context_safety:serious.checked?"serious":"normal"})});
+   const data=await r.json();
+   if(!r.ok){log.textContent="调用失败："+(data.detail||r.status);return}
+   if(data.event)handleEvent(data.event);
+   input.value="";
+ }catch(e){log.textContent="AI 请求失败："+e.message}
+ finally{send.disabled=false}
+};
+document.getElementById("normal").onclick=()=>handleEvent({type:"assistant.reply",reply:"资料已整理完毕。",aside:null,context_safety:"normal"});
+document.getElementById("tease").onclick=()=>{lastAside=false;handleEvent({type:"assistant.reply",reply:"这次已经整理好了。",aside:{text:"差点以为还有第八版……",expression:"tease_smile"},context_safety:"normal"})};
+document.getElementById("dismiss").onclick=hideAside;
+enabled.onchange=()=>{if(!enabled.checked)hideAside()};
+serious.onchange=()=>{if(serious.checked)hideAside()};
+window.addEventListener("pagehide",hideAside);
+init();
+</script></body></html>

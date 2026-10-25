@@ -1,0 +1,304 @@
+{
+  "version": "0.3.0",
+  "source_image": "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png",
+  "resolution": [
+    1024,
+    1536
+  ],
+  "number_of_reference_regions": 24,
+  "cubism_model_generated": false,
+  "warnings": [
+    "Parts overlap and may contain neighbouring regions; not ready for mesh deformation",
+    "Occluded areas of face, eye interior, mouth interior and jacket require repainting"
+  ],
+  "parts": [
+    {
+      "name": "hair_back_left",
+      "file": "layers/hair_back_left.png",
+      "bbox": [
+        189,
+        132,
+        407,
+        926
+      ],
+      "pixel_count": 58896,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "hair_back_right",
+      "file": "layers/hair_back_right.png",
+      "bbox": [
+        534,
+        75,
+        785,
+        916
+      ],
+      "pixel_count": 74041,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "hair_bangs",
+      "file": "layers/hair_bangs.png",
+      "bbox": [
+        382,
+        37,
+        584,
+        220
+      ],
+      "pixel_count": 28136,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "hair_side_left",
+      "file": "layers/hair_side_left.png",
+      "bbox": [
+        197,
+        163,
+        452,
+        846
+      ],
+      "pixel_count": 70090,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "hair_side_right",
+      "file": "layers/hair_side_right.png",
+      "bbox": [
+        548,
+        136,
+        785,
+        919
+      ],
+      "pixel_count": 75312,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "face_base",
+      "file": "layers/face_base.png",
+      "bbox": [
+        401,
+        132,
+        572,
+        304
+      ],
+      "pixel_count": 25629,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "eye_left_source",
+      "file": "layers/eye_left_source.png",
+      "bbox": [
+        411,
+        159,
+        496,
+        214
+      ],
+      "pixel_count": 3835,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "eye_right_source",
+      "file": "layers/eye_right_source.png",
+      "bbox": [
+        482,
+        154,
+        561,
+        210
+      ],
+      "pixel_count": 3731,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "brows_source",
+      "file": "layers/brows_source.png",
+      "bbox": [
+        416,
+        138,
+        565,
+        188
+      ],
+      "pixel_count": 5666,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "mouth_source",
+      "file": "layers/mouth_source.png",
+      "bbox": [
+        443,
+        225,
+        517,
+        269
+      ],
+      "pixel_count": 2894,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "neck_source",
+      "file": "layers/neck_source.png",
+      "bbox": [
+        432,
+        251,
+        578,
+        359
+      ],
+      "pixel_count": 12267,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "top",
+      "file": "layers/top.png",
+      "bbox": [
+        368,
+        283,
+        654,
+        579
+      ],
+      "pixel_count": 72738,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "jacket_left",
+      "file": "layers/jacket_left.png",
+      "bbox": [
+        236,
+        370,
+        416,
+        915
+      ],
+      "pixel_count": 73912,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "jacket_right",
+      "file": "layers/jacket_right.png",
+      "bbox": [
+        604,
+        385,
+        785,
+        944
+      ],
+      "pixel_count": 71364,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "hand_raised",
+      "file": "layers/hand_raised.png",
+      "bbox": [
+        307,
+        321,
+        518,
+        493
+      ],
+      "pixel_count": 20547,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "hand_down",
+      "file": "layers/hand_down.png",
+      "bbox": [
+        676,
+        840,
+        743,
+        957
+      ],
+      "pixel_count": 5197,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "bracelet",
+      "file": "layers/bracelet.png",
+      "bbox": [
+        306,
+        384,
+        423,
+        512
+      ],
+      "pixel_count": 11341,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "pendulum",
+      "file": "layers/pendulum.png",
+      "bbox": [
+        453,
+        316,
+        521,
+        438
+      ],
+      "pixel_count": 7315,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "abdomen",
+      "file": "layers/abdomen.png",
+      "bbox": [
+        379,
+        551,
+        629,
+        662
+      ],
+      "pixel_count": 23547,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "pants",
+      "file": "layers/pants.png",
+      "bbox": [
+        312,
+        608,
+        726,
+        1242
+      ],
+      "pixel_count": 168082,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "flip_phone",
+      "file": "layers/flip_phone.png",
+      "bbox": [
+        521,
+        659,
+        636,
+        773
+      ],
+      "pixel_count": 10382,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "small_box",
+      "file": "layers/small_box.png",
+      "bbox": [
+        648,
+        664,
+        761,
+        808
+      ],
+      "pixel_count": 14275,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "boot_left",
+      "file": "layers/boot_left.png",
+      "bbox": [
+        391,
+        1115,
+        531,
+        1519
+      ],
+      "pixel_count": 36609,
+      "status": "transparent ROI candidate; needs paint/rig"
+    },
+    {
+      "name": "boot_right",
+      "file": "layers/boot_right.png",
+      "bbox": [
+        608,
+        1116,
+        816,
+        1528
+      ],
+      "pixel_count": 37272,
+      "status": "transparent ROI candidate; needs paint/rig"
+    }
+  ]
+}

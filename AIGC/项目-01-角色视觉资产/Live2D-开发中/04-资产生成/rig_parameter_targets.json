@@ -1,0 +1,100 @@
+{
+  "note": "Target parameters for artist/Cubism Editor only. NOT implemented in a moc3 model.",
+  "required": [
+    {
+      "id": "ParamAngleX",
+      "min": -30,
+      "max": 30,
+      "default": 0
+    },
+    {
+      "id": "ParamAngleY",
+      "min": -30,
+      "max": 30,
+      "default": 0
+    },
+    {
+      "id": "ParamAngleZ",
+      "min": -30,
+      "max": 30,
+      "default": 0
+    },
+    {
+      "id": "ParamBodyAngleX",
+      "min": -10,
+      "max": 10,
+      "default": 0
+    },
+    {
+      "id": "ParamEyeLOpen",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    {
+      "id": "ParamEyeROpen",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    {
+      "id": "ParamEyeBallX",
+      "min": -1,
+      "max": 1,
+      "default": 0
+    },
+    {
+      "id": "ParamEyeBallY",
+      "min": -1,
+      "max": 1,
+      "default": 0
+    },
+    {
+      "id": "ParamMouthOpenY",
+      "min": 0,
+      "max": 1,
+      "default": 0
+    },
+    {
+      "id": "ParamMouthForm",
+      "min": -1,
+      "max": 1,
+      "default": 0
+    },
+    {
+      "id": "ParamBreath",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    }
+  ],
+  "expressions": [
+    {
+      "name": "neutral",
+      "optional": false
+    },
+    {
+      "name": "tease_smile",
+      "optional": true
+    },
+    {
+      "name": "tease_brow",
+      "optional": true
+    },
+    {
+      "name": "tease_sideeye",
+      "optional": true
+    },
+    {
+      "name": "focus",
+      "optional": true
+    }
+  ],
+  "physics_groups": [
+    "front_hair",
+    "side_hair",
+    "back_hair",
+    "jacket_hem",
+    "pendulum"
+  ]
+}
