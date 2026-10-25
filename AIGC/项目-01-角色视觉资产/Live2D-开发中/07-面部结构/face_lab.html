@@ -1,0 +1,99 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Klika Live2D · 面部分层实验室</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#e6e9e5;color:#23332b;font:14px/1.5 system-ui,"Microsoft YaHei",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:18px}
+h1{font-size:22px;margin:0}h2{font-size:16px;margin:0 0 12px}
+.sub{color:#65766d;margin:5px 0 16px}
+.panel{background:#f9fbf8;border-radius:16px;padding:14px;box-shadow:0 0 0 1px #cbd5cc}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+canvas{display:block;width:100%;height:550px;max-height:70vh;border-radius:10px;background:#f4f6f3}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}
+label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:#52665a}
+select,input{padding:7px;border:1px solid #afbfb2;background:white;border-radius:7px;color:#23372a;font:inherit}
+input[type=range]{min-width:140px}
+.check{flex-direction:row;align-items:center}
+a{color:#316a4d}.note{margin-top:14px;background:#f9fbf8;border-left:4px solid #667d6b;padding:12px 16px;border-radius:0 9px 9px 0;white-space:pre-wrap}
+small{color:#798b7d}
+@media(max-width:700px){.grid{grid-template-columns:1fr}canvas{height:420px}}
+</style></head><body><main>
+<h1>面部分层实验室 <small>v0.5 · 与人设图像素对应</small></h1>
+<p class="sub">直接检查源图与可编辑面部层的关系。默认只展示中立表情；尚无真实 Cubism 眨眼/张口绑定。</p>
+<div class="panel controls">
+<label>检查对象<select id="part"><option value="_neutral">中立表情重组（Neutral）</option></select></label>
+<label>放大比例<input id="zoom" type="range" min="1" max="3" step=".25" value="1.5"/></label>
+<label>透明层强度<input id="opacity" type="range" min="0" max="100" step="5" value="100"/></label>
+<label class="check"><input type="checkbox" id="background" checked/> 显示原画定位底图（右）</label>
+</div>
+<div class="grid">
+<section class="panel"><h2>左侧：原始人设图</h2><canvas id="original" width="530" height="560" aria-label="原始脸部参照"></canvas></section>
+<section class="panel"><h2>右侧：重组效果 / 选中部件</h2><canvas id="preview" width="530" height="560" aria-label="透明面部部件"></canvas></section>
+</div>
+<div class="note" id="details">正在读取源图和面部层清单……</div>
+<p class="sub"><a href="/">返回数字人界面</a>　<a href="/review">检查旧版 24 个全身参考区</a></p>
+<script>
+"use strict";
+const $=id=>document.getElementById(id),source=new Image(), cache=new Map();
+let data=null,chosen="_neutral";
+function checker(c){
+ c.fillStyle="#e3e8e1";c.fillRect(0,0,530,560);
+ c.fillStyle="#f5f7f4";
+ for(let y=0;y<560;y+=20)for(let x=0;x<530;x+=20)if(((x+y)/20)%2===0)c.fillRect(x,y,20,20);
+}
+function getImg(url){
+ if(cache.has(url))return cache.get(url);
+ const img=new Image();
+ const p=new Promise((ok,no)=>{img.onload=()=>ok(img);img.onerror=()=>no(Error("无法读取 "+url))});
+ img.src=url;cache.set(url,p);return p;
+}
+function region(record){
+ const z=Number($("zoom").value);
+ const [x1,y1,x2,y2]=record?.bbox||[389,125,567,270];
+ let cx=(x1+x2)/2,cy=(y1+y2)/2;
+ // For tiny iris, retain surrounding skin and eyelashes for spatial checking.
+ let ww=Math.max(178,(x2-x1)*2.3)/z, hh=Math.max(155,(y2-y1)*2.3)/z;
+ const aspect=530/560;
+ if(ww/hh<aspect)ww=hh*aspect;else hh=ww/aspect;
+ ww=Math.min(1024,ww);hh=Math.min(1536,hh);
+ return [Math.max(0,Math.min(1024-ww,cx-ww/2)),
+         Math.max(0,Math.min(1536-hh,cy-hh/2)),ww,hh];
+}
+function draw(c,img,rect,alpha=1){
+ c.globalAlpha=alpha;
+ c.drawImage(img,...rect,0,0,530,560);
+ c.globalAlpha=1;
+}
+async function update(){
+ if(!data)return;
+ const select=$("part"),layer=data.layers?.find(x=>x.name===select.value),r=region(layer);
+ const a=$("original").getContext("2d"),b=$("preview").getContext("2d");
+ checker(a);checker(b);draw(a,source,r);
+ if(select.value==="_neutral"){
+    draw(b,await getImg("/face-assets/01_face_neutral_recomposed.png"),r);
+    $("details").textContent="正常表情来自原图像素；独立眼白/虹膜、眉毛与嘴部重新拼合。面部重组平均 RGB 误差："+data.face_reassembly_mean_abs_RGB_error+"/255。仍无法通过此数据证明闭眼/张口或转头已绑定。";
+ }else{
+    if($("background").checked)draw(b,source,r,.17);
+    draw(b,await getImg("/face-assets/"+layer.file),r,Number($("opacity").value)/100);
+    $("details").textContent=select.value+"\n"+layer.status+"\n像素来源："+layer.source_pixels+
+      "\n透明画布固定为 1024×1536；此文件尚未获得 Cubism 网格与关键形变。";
+ }
+}
+async function start(){
+ try{
+    const results=await Promise.all([
+     fetch("/face-assets/manifest.json").then(r=>{if(!r.ok)throw Error("脸部素材尚未生成");return r.json()}),
+     getImg("/source/identity")
+    ]);
+    data=results[0];source.src=results[1].src;
+    for(const l of data.layers){
+      let option=document.createElement("option");option.value=l.name;option.textContent=l.name;
+      $("part").appendChild(option);
+    }
+    $("part").onchange=update;
+    for(const key of ["zoom","opacity","background"])$(key).oninput=update;
+    await update();
+ }catch(e){$("details").textContent="载入失败："+e.message+"。需要通过已启动的本机数字人服务访问 /face-review。";}
+}
+start();
+</script></main></body></html>
