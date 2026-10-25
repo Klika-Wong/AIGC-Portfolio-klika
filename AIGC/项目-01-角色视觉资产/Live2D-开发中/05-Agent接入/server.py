@@ -18,6 +18,8 @@ MODEL = HERE / "model"
 VENDOR = HERE / "vendor"
 IDENTITY = HERE.parent.parent / "人物设定-1" / "人设图.png"
 INSPECTOR = HERE.parent / "06-精修检查" / "inspector.html"
+FACE_LAB = HERE.parent / "07-面部结构" / "face_lab.html"
+FACE_ASSETS = HERE.parent / "07-面部结构" / "output"
 ENTRY = os.environ.get("KLIKA_MODEL_ENTRY", "character.model3.json")
 app = FastAPI(title="Klika Avatar Bridge", version="0.1.0")
 
@@ -57,6 +59,14 @@ async def index():
 async def review():
     return FileResponse(INSPECTOR)
 
+@app.get("/face-review")
+async def face_review():
+    return FileResponse(FACE_LAB)
+
+@app.get("/face-assets/{filepath:path}")
+async def face_asset(filepath: str):
+    return FileResponse(safe_file(FACE_ASSETS, filepath))
+
 @app.get("/source/identity")
 async def original_identity():
     if not IDENTITY.is_file():
@@ -70,6 +80,7 @@ async def status():
             "model_url": "/model/" + ENTRY if valid else None,
             "parts_available": (PARTS / "00_subject_cutout.png").exists(),
             "aside_default": None, "deepseek_ready": bool(os.environ.get("DEEPSEEK_API_KEY")),
+            "face_layers_ready": (FACE_ASSETS / "manifest.json").exists(),
             "subject_url": "/assets/00_subject_cutout_refined.png" if (PARTS / "00_subject_cutout_refined.png").exists()
                 else "/assets/00_subject_cutout.png"}
 

@@ -1,0 +1,70 @@
+name: Build Klika face-layer assets
+on:
+  push:
+    branches: [feature/live2d-facial-source-layers-v0.5, main]
+    paths:
+      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/build_face_layers.py'
+      - '.github/workflows/live2d-face-parts.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: klika-face-layer-build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install image build libraries
+        run: python -m pip install numpy==1.26.4 Pillow==10.4.0 opencv-python-headless==4.10.0.84
+      - name: Rebuild identity-preserving face parts from the original
+        run: |
+          python "AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/build_face_layers.py" \
+            --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
+            --subject "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output/00_subject_cutout_refined.png" \
+            --bangs "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output/05_front_hair_isolation_candidate.png" \
+            --out "AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/output"
+      - name: Validate generated transparent parts and layered ORA
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json,zipfile,xml.etree.ElementTree as ET
+          out=Path("AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/output")
+          m=json.loads((out/"manifest.json").read_text())
+          assert m["number_of_layers"]>=12
+          assert m["face_reassembly_mean_abs_RGB_error"]<2
+          assert not m["cubism_model_generated"]
+          for layer in m["layers"]:
+              im=Image.open(out/layer["file"])
+              assert im.mode=="RGBA" and im.size==(1024,1536)
+          with zipfile.ZipFile(out/"02_facial_parts_editable.ora") as z:
+              assert z.read("mimetype")==b"image/openraster"
+              assert len(ET.fromstring(z.read("stack.xml")).find("stack"))>=12
+          print("QA passed: identity preserved; explicit non-rigged status.")
+          PY
+      - name: Upload inspectable reference package
+        uses: actions/upload-artifact@v4
+        with:
+          name: klika-facial-art-source-locked-v05
+          path: AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/output
+          retention-days: 30
+      - name: Commit real PNG / ORA assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/output"
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(live2d): source-faithful facial parts with editable ORA and visual QA"
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

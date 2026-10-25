@@ -79,3 +79,34 @@ def test_status_exposes_reference_cutout_url():
     result = client.get("/api/status")
     assert result.status_code == 200
     assert result.json()["subject_url"].startswith("/assets/00_subject_cutout")
+
+
+def test_face_layer_review_page():
+    r = client.get("/face-review")
+    assert r.status_code == 200
+    assert "面部分层实验室" in r.text
+    assert 'id="preview"' in r.text
+
+def test_face_source_recomposition_manifest():
+    r = client.get("/face-assets/manifest.json")
+    assert r.status_code == 200
+    manifest = r.json()
+    assert manifest["number_of_layers"] >= 12
+    assert manifest["face_reassembly_mean_abs_RGB_error"] < 2
+    assert manifest["cubism_model_generated"] is False
+
+def test_face_layer_png_alpha():
+    r = client.get("/face-assets/layers/21_iris_left.png")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("image/png")
+
+
+def test_gaze_interaction_is_only_a_source_layer_preview():
+    r = client.get("/face-review")
+    assert r.status_code == 200
+    assert 'id="gazeX"' in r.text and 'id="gazeY"' in r.text
+    assert 'value="_gaze"' in r.text
+    manifest = client.get("/face-assets/manifest.json").json()
+    present = {layer["name"] for layer in manifest["layers"]}
+    assert {"20_eye_left_base","20_eye_right_base","21_iris_left","21_iris_right","30_mouth_neutral"} <= present
+    assert manifest["cubism_model_generated"] is False

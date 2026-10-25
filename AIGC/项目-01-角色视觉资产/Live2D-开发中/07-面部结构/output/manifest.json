@@ -1,0 +1,183 @@
+{
+  "version": "0.5.0",
+  "source_resolution": [
+    1024,
+    1536
+  ],
+  "face_reassembly_mean_abs_RGB_error": 0.785,
+  "face_pixels_delta_over_12_percent": 2.431,
+  "number_of_layers": 13,
+  "cubism_model_generated": false,
+  "needs_manual_paint": [
+    "Closed eyelid per side and separated lashes",
+    "White eye background behind moving iris",
+    "Open mouth interior, tongue, upper/lower lip deformation shapes",
+    "Eyebrow hidden under bangs",
+    "Skin and hair behind front hair and sideburns",
+    "Angle X/Y head-turn and neck/shoulder occlusions"
+  ],
+  "notes": [
+    "All source-backed facial parts retain their original identity pixels",
+    "Face-underpaint samples nearby skin and is not final skin artwork",
+    "Do not mirror the non-symmetric eyes",
+    "All parts at full-resolution canvas coordinates"
+  ],
+  "layers": [
+    {
+      "name": "00_face_underpaint",
+      "file": "layers/00_face_underpaint.png",
+      "bbox": [
+        189,
+        37,
+        816,
+        1528
+      ],
+      "status": "inpainted hidden surfaces; artist must improve for rotation and expression",
+      "source_pixels": "partly inferred skin"
+    },
+    {
+      "name": "10_brow_image_left_REFERENCE",
+      "file": "layers/10_brow_image_left_REFERENCE.png",
+      "bbox": [
+        426,
+        166,
+        469,
+        181
+      ],
+      "status": "reference only, mostly occluded by bangs",
+      "source_pixels": "original"
+    },
+    {
+      "name": "11_brow_image_right",
+      "file": "layers/11_brow_image_right.png",
+      "bbox": [
+        465,
+        147,
+        516,
+        174
+      ],
+      "status": "source-aligned movable brow candidate",
+      "source_pixels": "original"
+    },
+    {
+      "name": "20_eye_left_base",
+      "file": "layers/20_eye_left_base.png",
+      "bbox": [
+        430,
+        173,
+        473,
+        202
+      ],
+      "status": "iris-free eye/lid reference, sclera paint incomplete",
+      "source_pixels": "partly inferred"
+    },
+    {
+      "name": "21_iris_left",
+      "file": "layers/21_iris_left.png",
+      "bbox": [
+        443,
+        177,
+        462,
+        194
+      ],
+      "status": "independent source-colored iris for small gaze offsets",
+      "source_pixels": "original"
+    },
+    {
+      "name": "22_upper_lash_left_REFERENCE",
+      "file": "layers/22_upper_lash_left_REFERENCE.png",
+      "bbox": [
+        431,
+        174,
+        472,
+        189
+      ],
+      "status": "candidate outline only; separation includes small eyebrow/hair overlap",
+      "source_pixels": "original"
+    },
+    {
+      "name": "20_eye_right_base",
+      "file": "layers/20_eye_right_base.png",
+      "bbox": [
+        483,
+        158,
+        532,
+        191
+      ],
+      "status": "iris-free eye/lid reference, sclera paint incomplete",
+      "source_pixels": "partly inferred"
+    },
+    {
+      "name": "21_iris_right",
+      "file": "layers/21_iris_right.png",
+      "bbox": [
+        498,
+        164,
+        519,
+        183
+      ],
+      "status": "independent source-colored iris for small gaze offsets",
+      "source_pixels": "original"
+    },
+    {
+      "name": "22_upper_lash_right_REFERENCE",
+      "file": "layers/22_upper_lash_right_REFERENCE.png",
+      "bbox": [
+        486,
+        159,
+        531,
+        176
+      ],
+      "status": "candidate outline only; separation includes small eyebrow/hair overlap",
+      "source_pixels": "original"
+    },
+    {
+      "name": "30_mouth_neutral",
+      "file": "layers/30_mouth_neutral.png",
+      "bbox": [
+        462,
+        214,
+        517,
+        245
+      ],
+      "status": "source lip pose; opening/teeth/tongue still need painting",
+      "source_pixels": "original"
+    },
+    {
+      "name": "31_upper_lip_REFERENCE",
+      "file": "layers/31_upper_lip_REFERENCE.png",
+      "bbox": [
+        463,
+        214,
+        517,
+        229
+      ],
+      "status": "lip appearance reference, overlaps neutral mouth",
+      "source_pixels": "original"
+    },
+    {
+      "name": "32_lower_lip_REFERENCE",
+      "file": "layers/32_lower_lip_REFERENCE.png",
+      "bbox": [
+        462,
+        229,
+        516,
+        245
+      ],
+      "status": "lip appearance reference, overlaps neutral mouth",
+      "source_pixels": "original"
+    },
+    {
+      "name": "40_bangs_front_REFERENCE",
+      "file": "layers/40_bangs_front_REFERENCE.png",
+      "bbox": [
+        397,
+        37,
+        578,
+        175
+      ],
+      "status": "requires precise hairline/forehead hidden art; source-aligned mask",
+      "source_pixels": "original"
+    }
+  ]
+}
