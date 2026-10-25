@@ -49,5 +49,7 @@ jobs:
           git add "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
           if ! git diff --cached --quiet; then
             git commit -m "assets(live2d): generate editable original-aligned PNG and ORA layers"
+            git fetch origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
