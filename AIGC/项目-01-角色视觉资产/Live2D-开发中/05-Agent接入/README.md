@@ -15,6 +15,22 @@ python -m uvicorn server:app --host 127.0.0.1 --port 8765
 
 界面的按钮可演示普通回复和带气泡的回复。按钮是**人为演示**；正式运行时只有 Agent 自己决定给出非空 `aside` 才会出现气泡。
 
+## 1B. 直接连接 DeepSeek 对话（可选）
+
+不必改源代码。用户在自己的电脑上设置 API 密钥后启动同一个服务器，就能在预览网页的输入框里真实对话。
+
+Windows PowerShell（仅当前终端有效，请勿把密钥放到仓库中）：
+
+```powershell
+$env:DEEPSEEK_API_KEY = "填入你自己的 DeepSeek API Key"
+$env:DEEPSEEK_MODEL = "deepseek-flash"
+python -m uvicorn server:app --host 127.0.0.1 --port 8765
+```
+
+API 以 JSON 模式生成 `{"reply":"...","aside":null}` 或带有自然轻吐槽的可选 `aside`。模型决定是否产生气泡，前端默认不显示；认真/隐私模式强制禁用气泡。不请求、不显示模型的推理链。`deepseek_client.py` 默认使用官方 `https://api.deepseek.com/chat/completions`，模型 ID 和计费方式可能随服务更新，请参考 https://api-docs.deepseek.com/api/create-chat-completion/ 。
+
+**使用 DeepSeek API 会向该服务发送你在输入框中输入的文字，可能产生 API 费用**。不设置 API Key 时，仍能使用离线透明人物预览和本机事件总线。仓库没有、也不应该保存你的 API Key。
+
 ## 2. 给私人 AI 助手接入
 
 Agent 每条有效输出后，将结果发送到本机 HTTP 入口：
