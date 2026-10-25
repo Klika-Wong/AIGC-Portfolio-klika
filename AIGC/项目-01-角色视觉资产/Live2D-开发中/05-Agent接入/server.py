@@ -5,6 +5,7 @@ Do NOT bind publicly without authentication, TLS and origin restrictions.
 from __future__ import annotations
 import asyncio
 import os
+from urllib.parse import urlsplit
 from pathlib import Path
 from typing import Literal
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
@@ -73,6 +74,10 @@ async def vendor(filepath: str):
 
 @app.websocket("/ws")
 async def websocket(ws: WebSocket):
+    origin = ws.headers.get("origin")
+    if origin and urlsplit(origin).netloc != ws.headers.get("host"):
+        await ws.close(code=1008)
+        return
     await ws.accept()
     clients.add(ws)
     try:
