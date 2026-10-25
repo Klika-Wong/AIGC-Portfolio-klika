@@ -49,6 +49,7 @@ def foreground(src):
     m=max(6,int(w*.055))
     mask[:max(10,int(h*.009)),:]=0;mask[-max(10,int(h*.007)):,:]=0
     mask[:,:m]=0;mask[:,-m:]=0
+    cv2.setRNGSeed(1729)
     cv2.grabCut(cv2.cvtColor(arr,cv2.COLOR_RGB2BGR),mask,None,np.zeros((1,65),np.float64),np.zeros((1,65),np.float64),3,cv2.GC_INIT_WITH_MASK)
     alpha=np.where((mask==cv2.GC_FGD)|(mask==cv2.GC_PR_FGD),255,0).astype(np.uint8)
     ys=np.indices((h,w))[0];alpha[(ys>h*.927)&(arr.mean(axis=2)>84)]=0
