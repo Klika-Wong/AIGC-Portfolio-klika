@@ -1,0 +1,45 @@
+name: Build Live2D reference cutouts
+on:
+  push:
+    branches: [feature/live2d-thought-bubbles-v0.1]
+    paths:
+      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/**'
+      - '.github/workflows/live2d-cutouts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deterministic image dependencies
+        run: python -m pip install numpy==1.26.4 Pillow==10.4.0 opencv-python-headless==4.10.0.84
+      - name: Extract from ORIGINAL art
+        run: |
+          python "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/build_cutouts.py" \
+            --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
+            --out "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
+      - name: Upload asset package (works even if push is blocked)
+        uses: actions/upload-artifact@v4
+        with:
+          name: klika-live2d-reference-cutouts
+          path: AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output/
+          retention-days: 30
+      - name: Commit candidate PNGs to the feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
+          if ! git diff --cached --quiet; then
+            git commit -m "assets(live2d): generate editable original-aligned PNG and ORA layers"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
