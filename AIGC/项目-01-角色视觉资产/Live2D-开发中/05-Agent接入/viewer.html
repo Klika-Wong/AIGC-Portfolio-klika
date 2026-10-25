@@ -12,7 +12,7 @@
 .speech{position:absolute;bottom:12px;left:12px;right:12px;text-align:center;background:#121b1dbe;border:1px solid #67716c73;border-radius:12px;padding:9px 11px;font-size:15px;min-height:43px}
 .status{position:absolute;top:10px;left:10px;background:#172523cc;border-radius:9px;padding:4px 9px;font-size:12px;color:#c5d7ca}
 aside{align-self:start;background:#283130;border:1px solid #52605a;border-radius:18px;padding:20px}
-h1{font-size:20px;margin:0 0 5px}p{color:#b9c3bb}.hint{font-size:12px;color:#b7c1bb}button{border:1px solid #60756b;background:#3f594b;color:#fafafa;border-radius:9px;padding:10px 13px;cursor:pointer;margin:5px 6px 5px 0}button:hover{background:#4e6d59}label{display:block;margin:14px 0}code{color:#e4d5a9}output{display:block;color:#bbcbbe;white-space:pre-wrap;overflow-wrap:anywhere;background:#1d2525;padding:12px;border-radius:9px;min-height:72px}
+h1{font-size:20px;margin:0 0 5px}p{color:#b9c3bb}.hint{font-size:12px;color:#b7c1bb}button{border:1px solid #60756b;background:#3f594b;color:#fafafa;border-radius:9px;padding:10px 13px;cursor:pointer;margin:5px 6px 5px 0}button:hover{background:#4e6d59}label{display:block;margin:14px 0}code{color:#e4d5a9}textarea{width:100%;min-height:80px;resize:vertical;padding:10px;background:#1d2525;color:#f3f3ed;border:1px solid #5c6e62;border-radius:9px;font:inherit}output{display:block;color:#bbcbbe;white-space:pre-wrap;overflow-wrap:anywhere;background:#1d2525;padding:12px;border-radius:9px;min-height:72px}
 @media(max-width:800px){.layout{grid-template-columns:1fr}.stage{height:68vh;min-height:420px}.aside{max-width:60%}}@media(prefers-reduced-motion:reduce){#portrait{animation:none}.aside{transition:none}}
 </style></head><body>
 <main class="layout">
@@ -27,7 +27,7 @@ h1{font-size:20px;margin:0 0 5px}p{color:#b9c3bb}.hint{font-size:12px;color:#b7c
 <label><input type="checkbox" id="allowAside" checked> 允许偶发内心气泡（由模型决定）</label>
 <label><input type="checkbox" id="serious"> 严肃 / 隐私模式</label>
 <button id="normal">演示普通回答</button><button id="tease">演示轻吐槽</button><button id="dismiss">隐藏气泡</button>
-<p>接入方式：向本机的 <code>POST /api/events</code> 发送 <code>reply</code> 和可选 <code>aside</code>。具体字段见仓库 README。</p>
+<p class="hint">想直接聊天：在本机设置 DEEPSEEK_API_KEY 后使用下方输入框（每次请求会使用你的 DeepSeek API 额度）。</p><textarea id="chatInput" maxlength="2000" placeholder="和她说点什么……"></textarea><button id="sendChat">发送给 AI</button><p>其他 Agent 接入方式：向本机的 <code>POST /api/events</code> 发送 <code>reply</code> 和可选 <code>aside</code>。具体字段见仓库 README。</p>
 <output id="log">等待连接</output>
 </aside></main>
 <script>
@@ -98,9 +98,25 @@ async function init(){
   if(!state.parts_available){portrait.style.display="none";log.textContent="没有检测到透明人物素材，请先生成资产。"}
   if(state.model_url){try{await loadLive2D(state.model_url)}catch(e){log.textContent="Live2D 模型未能加载，使用原图预览："+e.message}}
   else{statusNode.textContent="原图预览（尚未绑定 Cubism）"}
+  if(state.deepseek_ready){log.textContent="DeepSeek 已配置，可以直接聊天。"}
  }catch(e){log.textContent="服务端状态读取失败："+e.message}
  wsConnect();
 }
+document.getElementById("sendChat").onclick=async()=>{
+ const input=document.getElementById("chatInput"), message=input.value.trim();
+ if(!message)return;
+ const send=document.getElementById("sendChat");
+ send.disabled=true;log.textContent="正在请求 DeepSeek...";
+ try{
+   const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message,allow_aside:enabled.checked,context_safety:serious.checked?"serious":"normal"})});
+   const data=await r.json();
+   if(!r.ok){log.textContent="调用失败："+(data.detail||r.status);return}
+   if(data.event)handleEvent(data.event);
+   input.value="";
+ }catch(e){log.textContent="AI 请求失败："+e.message}
+ finally{send.disabled=false}
+};
 document.getElementById("normal").onclick=()=>handleEvent({type:"assistant.reply",reply:"资料已整理完毕。",aside:null,context_safety:"normal"});
 document.getElementById("tease").onclick=()=>{lastAside=false;handleEvent({type:"assistant.reply",reply:"这次已经整理好了。",aside:{text:"差点以为还有第八版……",expression:"tease_smile"},context_safety:"normal"})};
 document.getElementById("dismiss").onclick=hideAside;
