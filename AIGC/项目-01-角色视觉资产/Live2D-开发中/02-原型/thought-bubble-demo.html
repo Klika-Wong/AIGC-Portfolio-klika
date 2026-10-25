@@ -12,41 +12,34 @@ figure{margin:0;height:100%;display:flex;justify-content:center;align-items:flex
 </style></head><body><main class="layout">
 <section class="stage" aria-label="原创角色和气泡效果预览"><figure><img src="../../人物设定-1/主要形象.jpg" alt="AIGC 仓库中的原始角色参考图（仅用于演示叠加层）"></figure>
 <div id="bubble" class="bubble" role="status" aria-live="off"></div><div class="stage-note">原始角色图片 · 独立气泡层（非 Live2D 绑定）</div></section>
-<section class="panel"><h1>轻吐槽 · 内心 OS</h1><span class="chip">v0.1 原型</span>
-<p class="muted">角色图片直接引用仓库原图；气泡为前端叠加层。正式版将此层放在 Live2D Canvas 上方。</p>
-<label><input id="enabled" type="checkbox" checked> 允许出现内心气泡</label>
-<label><input id="serious" type="checkbox"> 严肃 / 隐私模式（强制静默）</label>
-<p><button class="primary" id="task">新任务</button><button id="curious">有趣问题</button><button id="revision">反复修改</button><button id="praise">收到夸赞</button><button id="done">任务完成</button></p>
-<p><button id="random">按真实频率模拟</button><button id="demo">仅演示：跳过冷却</button><button id="hide">关闭当前气泡</button></p>
-<p class="muted">默认事件采用 20% 抽样、全局冷却 120 秒、每 10 分钟最多 2 次。演示按钮仅方便看视觉，不代表实际频率。严肃模式与总开关在演示模式同样有效。</p>
-<output id="log" aria-live="polite">准备就绪。点击一个事件，再点“仅演示”可看到气泡。</output>
+<section class="panel"><h1>轻吐槽 · 内心 OS</h1><span class="chip">v0.2 交互模拟</span>
+<p class="muted">真正的 AI 会自行判断是否生成 aside。这里仅用两种模拟输出检查展示效果，不接入模型。</p>
+<label><input id="enabled" type="checkbox" checked> 允许内心气泡</label>
+<label><input id="serious" type="checkbox"> 严肃 / 隐私模式</label>
+<p><button class="primary" id="aside">模拟：模型决定轻吐槽</button><button id="silent">模拟：模型正常回答</button><button id="hide">关闭气泡</button></p>
+<output id="log" aria-live="polite">等待模拟模型输出。</output>
 </section></main>
 <script>
 "use strict";
-const config={probability:0.2,cooldownMs:120000,windowMs:600000,maxPerWindow:2,durationMs:2600};
-const bank={new_task:["又有新任务了呀。","这次又是什么呢。"],curious:["哦？有点意思。","这个角度可以。"],revision:["第几版来着……","好好好，再调整。"],praise:["有点开心，藏一下。","夸奖收到了。"],completed:["这次发挥还不错。","嗯，稳稳完成。"]};
-const ui={bubble:document.querySelector("#bubble"),log:document.querySelector("#log"),enabled:document.querySelector("#enabled"),serious:document.querySelector("#serious")};
-let current="new_task",lastAt=-Infinity,history=[],timer=0,seen=new Set();
-const say=s=>{ui.log.textContent=s};
-function hide(){clearTimeout(timer);ui.bubble.classList.remove("visible");timer=0}
-function show(category,{force=false,eventId=null}={}){
- if(!ui.enabled.checked||ui.serious.checked){hide();say("静默：用户关闭气泡或处于严肃/隐私模式。");return false}
- if(eventId&&seen.has(eventId)){say("已去重。");return false}
- const now=Date.now();history=history.filter(t=>now-t<config.windowMs);
- if(!force&&(now-lastAt<config.cooldownMs||history.length>=config.maxPerWindow)){say("跳过：触发冷却或 10 分钟上限。");return false}
- if(!force&&Math.random()>=config.probability){say("本次不触发（偶发概率筛选）。");return false}
- if(ui.bubble.classList.contains("visible")){say("已有气泡，拒绝排队。");return false}
- const options=bank[category]||bank.new_task;const message=options[Math.floor(Math.random()*options.length)];
- if(message.length>32){say("文案长度不合规。");return false}
- ui.bubble.textContent=message;ui.bubble.classList.add("visible");if(!force){history.push(now);lastAt=now}if(eventId){seen.add(eventId);if(seen.size>100)seen.clear()}
- timer=setTimeout(hide,config.durationMs);say("展示："+message+(force?"（演示模式）":""));return true
+const bubble=document.getElementById("bubble"), log=document.getElementById("log"), enabled=document.getElementById("enabled"),serious=document.getElementById("serious");
+let timer=0,previousAside=false;
+function hide(){clearTimeout(timer);bubble.classList.remove("visible");}
+function renderAgentResponse(result){
+  hide();
+  if(!result||typeof result.reply!=="string")return;
+  log.textContent="模型回答："+result.reply;
+  if(!enabled.checked||serious.checked||!result.aside||typeof result.aside.text!=="string"){previousAside=false;return;}
+  const text=result.aside.text.trim();
+  if(!text||text.length>24||previousAside){previousAside=false;return;}
+  bubble.textContent=text;
+  bubble.classList.add("visible");previousAside=true;
+  timer=setTimeout(hide,2600);
 }
-const map={task:"new_task",curious:"curious",revision:"revision",praise:"praise",done:"completed"};
-for(const [id,cat] of Object.entries(map)){document.getElementById(id).addEventListener("click",()=>{current=cat;show(cat)})}
-document.getElementById("random").addEventListener("click",()=>show(current));
-document.getElementById("demo").addEventListener("click",()=>{hide();show(current,{force:true})});
-document.getElementById("hide").addEventListener("click",()=>{hide();say("已关闭当前气泡。")});
-ui.enabled.addEventListener("change",()=>{if(!ui.enabled.checked){hide();say("用户已关闭气泡。")}});
-ui.serious.addEventListener("change",()=>{if(ui.serious.checked){hide();say("严肃 / 隐私模式：气泡禁用。")}});
+document.getElementById("aside").onclick=()=>renderAgentResponse({reply:"这次已经整理好了。",aside:{text:"差点以为还有第八版……",expression:"tease_smile"}});
+document.getElementById("silent").onclick=()=>renderAgentResponse({reply:"资料已经整理好了。",aside:null});
+document.getElementById("hide").onclick=hide;
+enabled.onchange=()=>{if(!enabled.checked)hide();};
+serious.onchange=()=>{if(serious.checked)hide();};
+window.addEventListener("avatar:response",e=>renderAgentResponse(e.detail));
 window.addEventListener("pagehide",hide);
 </script></body></html>
