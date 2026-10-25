@@ -4,6 +4,7 @@ on:
     branches: [feature/live2d-thought-bubbles-v0.1]
     paths:
       - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/**'
+      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/05-Agent接入/**'
       - '.github/workflows/live2d-cutouts.yml'
   workflow_dispatch:
 
