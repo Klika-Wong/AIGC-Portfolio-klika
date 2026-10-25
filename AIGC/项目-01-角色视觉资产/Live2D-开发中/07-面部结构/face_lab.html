@@ -21,9 +21,11 @@ small{color:#798b7d}
 <h1>面部分层实验室 <small>v0.5 · 与人设图像素对应</small></h1>
 <p class="sub">直接检查源图与可编辑面部层的关系。默认只展示中立表情；尚无真实 Cubism 眨眼/张口绑定。</p>
 <div class="panel controls">
-<label>检查对象<select id="part"><option value="_neutral">中立表情重组（Neutral）</option></select></label>
+<label>检查对象<select id="part"><option value="_neutral">中立表情重组（Neutral）</option><option value="_gaze">独立虹膜注视方向（可交互测试）</option></select></label>
 <label>放大比例<input id="zoom" type="range" min="1" max="3" step=".25" value="1.5"/></label>
 <label>透明层强度<input id="opacity" type="range" min="0" max="100" step="5" value="100"/></label>
+<label>眼球 X（原画像素）<input id="gazeX" type="range" min="-3" max="3" step="1" value="0"/></label>
+<label>眼球 Y（原画像素）<input id="gazeY" type="range" min="-2" max="2" step="1" value="0"/></label>
 <label class="check"><input type="checkbox" id="background" checked/> 显示原画定位底图（右）</label>
 </div>
 <div class="grid">
@@ -69,7 +71,17 @@ async function update(){
  const select=$("part"),layer=data.layers?.find(x=>x.name===select.value),r=region(layer);
  const a=$("original").getContext("2d"),b=$("preview").getContext("2d");
  checker(a);checker(b);draw(a,source,r);
- if(select.value==="_neutral"){
+ if(select.value==="_gaze"){
+   const dx=Number($("gazeX").value),dy=Number($("gazeY").value);
+   const order=["00_face_underpaint","11_brow_image_right","20_eye_left_base","21_iris_left","20_eye_right_base","21_iris_right","30_mouth_neutral","40_bangs_front_REFERENCE"];
+   for(const id of order){
+     const part=data.layers.find(x=>x.name===id);if(!part)continue;
+     const pic=await getImg("/face-assets/"+part.file);
+     const shifted=id.startsWith("21_iris")?[r[0]-dx,r[1]-dy,r[2],r[3]]:r;
+     draw(b,pic,shifted);
+   }
+   $("details").textContent="独立虹膜位移演示："+dx+" px（水平）／"+dy+" px（垂直）。此功能验证眼球与眼底确实分层；可控幅度有限，眼睑和完整眼白还需补画，尚不是 Cubism 动画。";
+ }else if(select.value==="_neutral"){
     draw(b,await getImg("/face-assets/01_face_neutral_recomposed.png"),r);
     $("details").textContent="正常表情来自原图像素；独立眼白/虹膜、眉毛与嘴部重新拼合。面部重组平均 RGB 误差："+data.face_reassembly_mean_abs_RGB_error+"/255。仍无法通过此数据证明闭眼/张口或转头已绑定。";
  }else{
@@ -91,7 +103,7 @@ async function start(){
       $("part").appendChild(option);
     }
     $("part").onchange=update;
-    for(const key of ["zoom","opacity","background"])$(key).oninput=update;
+    for(const key of ["zoom","opacity","background","gazeX","gazeY"])$(key).oninput=update;
     await update();
  }catch(e){$("details").textContent="载入失败："+e.message+"。需要通过已启动的本机数字人服务访问 /face-review。";}
 }
