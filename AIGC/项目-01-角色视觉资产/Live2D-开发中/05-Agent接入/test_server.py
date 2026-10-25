@@ -99,3 +99,14 @@ def test_face_layer_png_alpha():
     r = client.get("/face-assets/layers/21_iris_left.png")
     assert r.status_code == 200
     assert r.headers["content-type"].startswith("image/png")
+
+
+def test_gaze_interaction_is_only_a_source_layer_preview():
+    r = client.get("/face-review")
+    assert r.status_code == 200
+    assert 'id="gazeX"' in r.text and 'id="gazeY"' in r.text
+    assert 'value="_gaze"' in r.text
+    manifest = client.get("/face-assets/manifest.json").json()
+    present = {layer["name"] for layer in manifest["layers"]}
+    assert {"20_eye_left_base","20_eye_right_base","21_iris_left","21_iris_right","30_mouth_neutral"} <= present
+    assert manifest["cubism_model_generated"] is False
