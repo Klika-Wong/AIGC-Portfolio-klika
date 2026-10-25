@@ -1,56 +1,36 @@
-# 项目 01｜角色视觉资产
+# 项目 01｜私人原创角色视觉资产
 
-个人 AI 辅助角色视觉资产项目，包含角色设定、参考图、拆分素材、提示词设计和迭代注意事项。
+这里保存一位成年女性原创 AI 角色的身份、提示词、视觉参考和 Live2D 制作素材。**不是授权公众使用的图像素材包**。
 
-## 内容
+## 身份资料
 
-- `人物设定-1/`：角色参考图、主图、生成图、拆分素材和角色档案。
-- `角色设计提示词参考.txt`：身份保持、构图、道具和后续优化规则。
-- `注意事项/`：较早版本的提示词与编辑指导。
-- `人物设定-2/`：预留的后续角色或版本目录。
+- [人物形象.txt](人物设定-1/人物形象.txt)：20 岁成年女性、165 cm、黑色齐腰长直发和刘海、灰绿/卡其色敞开外套、深色高领短款内搭与裤装。
+- [主要形象.jpg](人物设定-1/主要形象.jpg)：原始视觉身份与面部辨识度参考。
+- [人设图.png](人物设定-1/人设图.png)：现有 Live2D 透明区域/面部拆层的具体像素来源。
+- [角色设计提示词参考.txt](角色设计提示词参考.txt)：身份不漂移、服饰/比例/手势/脚部的优化约束。
+- 饰品与道具：右腕黑曜石珠串与银质戒指、白水晶吊坠、右裤袋复古翻盖手机、左外套口袋深色小盒。
 
-## Character 1
+核心要求：保持脸型、眼神和刘海，精细化不能变成另一个人。外表可自然、偶尔俏皮，但不强迫单一高冷或卖萌风格。**画面左右与角色自身左右必须区分**。
 
-The first character is an adult woman, 20 years old and 165 cm tall. Her visual direction is cool, restrained, and distant, with a subtle contrast between an outwardly composed attitude and a slightly playful confidence.
+## 开发状态
 
-### Visual anchors
+| 分类 | 状态 |
+| --- | --- |
+| 原始人设、提示词、参考图 | 已收录，权利来源仍需逐件核对 |
+| 全身透明分区 | 已生成 24 个候选层，包含相邻部件的交叉 |
+| 面部拆层 | 已生成 13 个候选/参考层与中立表情复合测试 |
+| 可编辑工程 | 已有 ORA，仍需人工补画和 PSD 精修 |
+| 正式 Live2D | **未完成**：缺少闭眼、口腔、遮挡、Cubism Rig 和 .moc3 导出 |
 
-- Waist-length straight black hair with bangs
-- Khaki or grey-green open jacket, dark inner top, and dark trousers
-- Black obsidian bead bracelet with a silver ring
-- White crystal pendulum necklace
-- Vintage flip phone partly visible in the right trouser pocket
-- Small dark-brown box in the left jacket pocket
+[进入 Live2D 工作目录](Live2D-开发中/)；技术 QA 不构成法律授权证明。
 
-### Generation principle
+## 私人资产与授权
 
-The core rule is to refine the existing character rather than redesign her. Every iteration should preserve facial identity, clothing structure, prop relationships, and overall silhouette before improving materials, anatomy, hand structure, and composition.
+- 用户声明角色设计为自主 AI 辅助创作。有关素材的权属、第三方视觉参考及平台输出条款以可核实的创作记录和现行法律为准。
+- 无开放素材许可；未经所有者许可不得复制再分发、出售、公开训练或冒名归属。
+- `人物设定-1/image*.png` 等参考图、某些分段图及三视图的具体生成与第三方引用来源**尚未充分记录**，不能自动贴上“已清版权/可商用”。
+- 每轮修图保留源图、版本和 provenance，不覆盖原始档案；需要发布才执行完整权利与隐私审查。
 
-See [`角色设计提示词参考.txt`](角色设计提示词参考.txt) for the detailed constraints.
+内部文档：[私人资产政策](../../PRIVATE_ASSETS.md) · [逐件登记](ASSET_REGISTER.md) · [审查结论](ASSET_COMPLIANCE_REVIEW.md)。
 
-## Asset notes
-
-The images are visual references and separated asset parts. The text files document character identity, prompt constraints, and reusable iteration rules for future image-generation workflows.
-
-## Suggested workflow
-
-1. Read [`人物设定-1/人物形象.txt`](人物设定-1/人物形象.txt).
-2. Use [`人物设定-1/主要形象.jpg`](人物设定-1/主要形象.jpg) as the primary identity reference.
-3. Combine the reference image with [`角色设计提示词参考.txt`](角色设计提示词参考.txt).
-4. Review facial identity, body proportions, clothing coverage, hands, and complete footwear after each iteration.
-
-## 权利、许可与 AI 使用说明
-
-本项目是 AI 辅助创作记录。作者对角色设定、提示词、参考选择、构图约束、筛选、修改、编排和文档整理等人类贡献主张相应权利；AI 单独生成的部分是否受保护、保护范围多大，取决于适用法域和具体人类贡献，不能据此保证自动获得完整著作权。
-
-未经作者书面许可，不得复制、再分发、商业发布、用于数据集训练或模型微调、冒名归属或制作衍生作品。AI 工具不被声明为作者或发明人；工具平台的输出许可、第三方素材许可、模型条款和参考图权利仍需单独遵守。本说明不构成法律意见。
-
-如未来考虑专利或其他注册权利，应在公开技术细节前咨询适用法域的专业人士；本项目中的角色图和提示词通常不等同于可申请专利的技术发明。
-
-## 隐私与安全
-
-本项目不应保存或提交密码、API Key、Token、Cookie、授权头、个人记忆文档或未获许可的第三方素材。发布前应检查图片元数据、文件历史、生成平台标识和第三方权利。
-
-## Status
-
-This portfolio is a work in progress. Future updates may add character 2, version comparisons, generation parameters, and final presentation pieces.
+当前项目目录不承担公共授权、公开作品集或外部合作招募用途。
