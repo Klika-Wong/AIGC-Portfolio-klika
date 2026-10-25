@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field, ConfigDict
 HERE = Path(__file__).resolve().parent
 PARTS = HERE.parent / "04-资产生成" / "output"
 MODEL = HERE / "model"
+VENDOR = HERE / "vendor"
 ENTRY = os.environ.get("KLIKA_MODEL_ENTRY", "character.model3.json")
 app = FastAPI(title="Klika Avatar Bridge", version="0.1.0")
 
@@ -65,6 +66,10 @@ async def assets(filepath: str):
 @app.get("/model/{filepath:path}")
 async def models(filepath: str):
     return FileResponse(safe_file(MODEL, filepath))
+
+@app.get("/vendor/{filepath:path}")
+async def vendor(filepath: str):
+    return FileResponse(safe_file(VENDOR, filepath))
 
 @app.websocket("/ws")
 async def websocket(ws: WebSocket):
