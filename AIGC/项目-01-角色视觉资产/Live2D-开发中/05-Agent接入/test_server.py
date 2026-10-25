@@ -1,11 +1,10 @@
 """FastAPI bridge smoke tests. Run pytest -q test_server.py"""
-import importlib.util
+import sys
 from pathlib import Path
 from fastapi.testclient import TestClient
 
-spec = importlib.util.spec_from_file_location("klika_bridge", Path(__file__).with_name("server.py"))
-mod = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(mod)
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import server as mod
 client = TestClient(mod.app)
 
 def test_status():
