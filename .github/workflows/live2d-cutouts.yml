@@ -5,6 +5,7 @@ on:
     paths:
       - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/build_cutouts.py'
       - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/audit_parts.py'
+      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/refine_front_hair.py'
       - '.github/workflows/live2d-cutouts.yml'
   workflow_dispatch:
 
@@ -40,6 +41,11 @@ jobs:
       - name: Precision audit without changing original identity
         run: |
           python "AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/audit_parts.py" \
+            --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
+            --assets "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
+      - name: Isolate a narrower source-aligned front-hair reference
+        run: |
+          python "AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/refine_front_hair.py" \
             --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
             --assets "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
       - name: Upload asset package (works even if push is blocked)
