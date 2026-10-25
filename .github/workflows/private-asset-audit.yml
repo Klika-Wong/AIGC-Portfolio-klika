@@ -1,0 +1,31 @@
+name: Private assets safety audit (no uploads)
+on:
+  push:
+    branches: [main, docs/private-asset-compliance-audit-v0.6]
+    paths:
+      - 'tools/private_asset_audit.py'
+      - 'PRIVATE_ASSETS.md'
+      - 'AIGC/项目-01-角色视觉资产/ASSET_*.md'
+      - '.github/workflows/private-asset-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install image header reader
+        run: python -m pip install Pillow==10.4.0
+      - name: Audit privately, aggregate metrics only
+        run: python tools/private_asset_audit.py
+      # Deliberately NO upload-artifact: results print counts, not image pixels,
+      # metadata values, raw prompt text, or private conversation content.

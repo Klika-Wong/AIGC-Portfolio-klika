@@ -1,9 +1,13 @@
-# Contribution Notes
+# 私人角色资产：变更规则（仓库当前 Public）
 
-This is a personal character-asset repository. When contributing:
+本项目并非开放社区项目。本文件仅为项目所有者及获授权协作者的内部规则，不意味着邀请公众使用或贡献资产。
 
-- Do not overwrite or delete original assets; add new versions with clear names or directories.
-- Update the character notes when identity, clothing, or key props change.
-- Never commit API keys, tokens, cookies, passwords, or other sensitive data.
-- Preserve source, version, or generation-tool information when it is known; do not guess missing metadata.
-- Check filenames, image previews, and README links before committing.
+1. 不覆盖或删除原始人设图和源提示词；任何实验以新目录、稳定 ID 与版本号保存。
+2. 将原始图、生成工具/模型、输入参考、补绘贡献、适用许可与变化记录链接到[资产登记](ASSET_REGISTER.md)。**信息不明写“待核实”，不可臆造授权证明。**
+3. 不能把来源不明的外部图片直接纳入对外展示/可销售模型。个人角色原件、第三方素材与 Cubism 软件各有不同权利边界。
+4. 不提交 Token、API Key、密码、个人记忆、原始授权凭证、付款记录、客户资料或不可公开的对话。
+5. 修改 GitHub Actions 或运行时网络访问时检查数据是否被上传、是否写入历史 artifact/日志，以及是否启用了第三方 CDN/云模型。
+6. 通过 Python 自动测试不等于已完成美术绑定；静态 PNG/ORA、Rig 和真正的 `.moc3` 按不同阶段验收。
+7. 任何开放 LICENSE、公开 fork、第三方平台投稿、商业分发均需所有者明确批准。
+
+PR 说明应包含变更列表、文件来源、授权核查结果、是否涉及上传/外发、实际验证结果和回滚方式。不要在评论中公开私密素材的外部副本或原始证据。

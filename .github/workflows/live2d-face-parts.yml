@@ -1,10 +1,7 @@
 name: Build Klika face-layer assets
+# Private original artwork: execute only on explicit owner workflow_dispatch.
+# This uses a GitHub-hosted runner and is NOT offline processing.
 on:
-  push:
-    branches: [feature/live2d-facial-source-layers-v0.5, main]
-    paths:
-      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/build_face_layers.py'
-      - '.github/workflows/live2d-face-parts.yml'
   workflow_dispatch:
 
 concurrency:
@@ -51,13 +48,7 @@ jobs:
               assert len(ET.fromstring(z.read("stack.xml")).find("stack"))>=12
           print("QA passed: identity preserved; explicit non-rigged status.")
           PY
-      - name: Upload inspectable reference package
-        uses: actions/upload-artifact@v4
-        with:
-          name: klika-facial-art-source-locked-v05
-          path: AIGC/项目-01-角色视觉资产/Live2D-开发中/07-面部结构/output
-          retention-days: 30
-      - name: Commit real PNG / ORA assets
+      - name: Commit reviewed candidate PNG / ORA assets to selected branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
