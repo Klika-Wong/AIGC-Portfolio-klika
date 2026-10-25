@@ -1,0 +1,170 @@
+{
+  "version": "0.4.0",
+  "reference": "人设图.png",
+  "source_resolution": [
+    1024,
+    1536
+  ],
+  "candidate_part_count": 24,
+  "identity_reference_color_preserved": true,
+  "overlap_pixel_count": 253877,
+  "scalp_alpha_microhole_pixels_repaired": 68,
+  "scalp_repaired_holes": [
+    {
+      "x": 518,
+      "y": 68,
+      "pixels": 17
+    },
+    {
+      "x": 508,
+      "y": 98,
+      "pixels": 32
+    },
+    {
+      "x": 508,
+      "y": 105,
+      "pixels": 9
+    },
+    {
+      "x": 503,
+      "y": 109,
+      "pixels": 8
+    },
+    {
+      "x": 397,
+      "y": 121,
+      "pixels": 2
+    }
+  ],
+  "model3_status": "NOT_GENERATED",
+  "attention_required": [
+    "Hair/bangs ROI overlaps skin and clothing; separate hair strands and paint occulted skin manually",
+    "Eyes are excerpts, not separately movable iris/eyelid/white parts",
+    "Mouth is a source excerpt; missing jaw interior/teeth/tongue and lip keyforms",
+    "Current regions overlap each other; not a clean PSD-ready Live2D layer structure",
+    "Face close-up resolution from original is small; higher resolution repaint must preserve identity",
+    "Boot edges, pendulum, bracelet, pocket items need hand-checked pixel masks"
+  ],
+  "per_part": {
+    "hair_back_left": {
+      "opaque_pixels": 54586,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "hair_back_right": {
+      "opaque_pixels": 70747,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "hair_bangs": {
+      "opaque_pixels": 27206,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "hair_side_left": {
+      "opaque_pixels": 66814,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "hair_side_right": {
+      "opaque_pixels": 72426,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "face_base": {
+      "opaque_pixels": 24946,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "eye_left_source": {
+      "opaque_pixels": 3559,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "eye_right_source": {
+      "opaque_pixels": 3464,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "brows_source": {
+      "opaque_pixels": 5271,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "mouth_source": {
+      "opaque_pixels": 2662,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "neck_source": {
+      "opaque_pixels": 11735,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "top": {
+      "opaque_pixels": 71450,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "jacket_left": {
+      "opaque_pixels": 71408,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "jacket_right": {
+      "opaque_pixels": 68682,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "hand_raised": {
+      "opaque_pixels": 19727,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "hand_down": {
+      "opaque_pixels": 4651,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "bracelet": {
+      "opaque_pixels": 10846,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "pendulum": {
+      "opaque_pixels": 6825,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "abdomen": {
+      "opaque_pixels": 22796,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "pants": {
+      "opaque_pixels": 164927,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "flip_phone": {
+      "opaque_pixels": 9887,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "small_box": {
+      "opaque_pixels": 13752,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "boot_left": {
+      "opaque_pixels": 35048,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    },
+    "boot_right": {
+      "opaque_pixels": 35644,
+      "changed_source_color_pixels": 0,
+      "suitable_for_direct_cubism_rig": false
+    }
+  }
+}

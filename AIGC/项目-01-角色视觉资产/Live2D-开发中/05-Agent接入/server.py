@@ -16,6 +16,8 @@ HERE = Path(__file__).resolve().parent
 PARTS = HERE.parent / "04-资产生成" / "output"
 MODEL = HERE / "model"
 VENDOR = HERE / "vendor"
+IDENTITY = HERE.parent.parent / "人物设定-1" / "人设图.png"
+INSPECTOR = HERE.parent / "06-精修检查" / "inspector.html"
 ENTRY = os.environ.get("KLIKA_MODEL_ENTRY", "character.model3.json")
 app = FastAPI(title="Klika Avatar Bridge", version="0.1.0")
 
@@ -51,13 +53,25 @@ clients: set[WebSocket] = set()
 async def index():
     return FileResponse(HERE / "viewer.html")
 
+@app.get("/review")
+async def review():
+    return FileResponse(INSPECTOR)
+
+@app.get("/source/identity")
+async def original_identity():
+    if not IDENTITY.is_file():
+        raise HTTPException(status_code=404, detail="Original reference unavailable")
+    return FileResponse(IDENTITY)
+
 @app.get("/api/status")
 async def status():
     valid = (MODEL / ENTRY).is_file()
     return {"connected": True, "mode": "cubism" if valid else "reference_preview",
             "model_url": "/model/" + ENTRY if valid else None,
             "parts_available": (PARTS / "00_subject_cutout.png").exists(),
-            "aside_default": None, "deepseek_ready": bool(os.environ.get("DEEPSEEK_API_KEY"))}
+            "aside_default": None, "deepseek_ready": bool(os.environ.get("DEEPSEEK_API_KEY")),
+            "subject_url": "/assets/00_subject_cutout_refined.png" if (PARTS / "00_subject_cutout_refined.png").exists()
+                else "/assets/00_subject_cutout.png"}
 
 def safe_file(root: Path, filepath: str) -> Path:
     base = root.resolve()
