@@ -1,9 +1,10 @@
 name: Build Live2D reference cutouts
 on:
   push:
-    branches: [feature/live2d-thought-bubbles-v0.1]
+    branches: [main, feature/live2d-detail-inspector-v0.4]
     paths:
-      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/**'
+      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/build_cutouts.py'
+      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/audit_parts.py'
       - '.github/workflows/live2d-cutouts.yml'
   workflow_dispatch:
 
@@ -36,6 +37,11 @@ jobs:
           python "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/build_cutouts.py" \
             --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
             --out "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
+      - name: Precision audit without changing original identity
+        run: |
+          python "AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/audit_parts.py" \
+            --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
+            --assets "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
       - name: Upload asset package (works even if push is blocked)
         uses: actions/upload-artifact@v4
         with:
