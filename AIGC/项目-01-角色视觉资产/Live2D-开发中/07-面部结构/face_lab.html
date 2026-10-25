@@ -85,7 +85,7 @@ async function start(){
      fetch("/face-assets/manifest.json").then(r=>{if(!r.ok)throw Error("脸部素材尚未生成");return r.json()}),
      getImg("/source/identity")
     ]);
-    data=results[0];source.src=results[1].src;
+    data=results[0];source.src=results[1].src;await source.decode();
     for(const l of data.layers){
       let option=document.createElement("option");option.value=l.name;option.textContent=l.name;
       $("part").appendChild(option);
