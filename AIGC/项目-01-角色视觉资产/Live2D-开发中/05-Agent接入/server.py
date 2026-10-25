@@ -39,6 +39,12 @@ class AvatarEvent(BaseModel):
             data["aside"] = None
         return data
 
+class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    message: str = Field(min_length=1, max_length=2000)
+    allow_aside: bool = True
+    context_safety: Literal["normal", "serious", "sensitive", "crisis"] = "normal"
+
 clients: set[WebSocket] = set()
 
 @app.get("/")
@@ -51,7 +57,7 @@ async def status():
     return {"connected": True, "mode": "cubism" if valid else "reference_preview",
             "model_url": "/model/" + ENTRY if valid else None,
             "parts_available": (PARTS / "00_subject_cutout.png").exists(),
-            "aside_default": None}
+            "aside_default": None, "deepseek_ready": bool(os.environ.get("DEEPSEEK_API_KEY"))}
 
 def safe_file(root: Path, filepath: str) -> Path:
     base = root.resolve()
@@ -88,6 +94,33 @@ async def websocket(ws: WebSocket):
         pass
     finally:
         clients.discard(ws)
+
+@app.post("/api/chat")
+async def chat(request: ChatRequest):
+    if not os.environ.get("DEEPSEEK_API_KEY"):
+        raise HTTPException(status_code=503, detail="Configure DEEPSEEK_API_KEY to enable real AI dialogue")
+    try:
+        from deepseek_client import generate
+        result = await generate(request.message, request.allow_aside,
+                                request.context_safety != "normal")
+    except Exception as exc:
+        # Do not expose credential, upstream response body or private content in errors.
+        raise HTTPException(status_code=502, detail="DeepSeek request or JSON parsing failed") from exc
+    aside = None
+    if request.allow_aside and request.context_safety == "normal" and isinstance(result.get("aside"), dict):
+        try:
+            aside = Aside.model_validate(result["aside"])
+        except Exception:
+            pass
+    event = AvatarEvent(reply=result["reply"], aside=aside,
+                        context_safety=request.context_safety)
+    payload = event.clean()
+    for ws in list(clients):
+        try:
+            await ws.send_json(payload)
+        except Exception:
+            clients.discard(ws)
+    return {"ok": True, "event": payload, "listeners": len(clients)}
 
 @app.post("/api/events")
 async def publish(event: AvatarEvent):
