@@ -138,7 +138,7 @@ def produce(original,subject,output,bangs=None):
     extras=[name for name in layers if name not in order]
     with zipfile.ZipFile(output/"02_facial_parts_editable.ora","w") as z:
         z.writestr("mimetype","image/openraster",compress_type=zipfile.ZIP_STORED)
-        for i,name in enumerate(reversed(order)+extras):
+        for i,name in enumerate(extras+list(reversed(order))):
             filename=f"data/face_{i:02d}.png"
             # ORA stack order top to bottom: reversed list arranges base last.
             visible="visible" if name in order else "hidden"
