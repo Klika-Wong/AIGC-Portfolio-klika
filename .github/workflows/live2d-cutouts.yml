@@ -23,6 +23,10 @@ jobs:
           python-version: '3.11'
       - name: Install deterministic image dependencies
         run: python -m pip install numpy==1.26.4 Pillow==10.4.0 opencv-python-headless==4.10.0.84
+      - name: Install bridge smoke-test dependencies
+        run: python -m pip install -r "AIGC/项目-01-角色视觉资产/Live2D-开发中/05-Agent接入/requirements.txt" httpx pytest
+      - name: Test avatar HTTP/WebSocket bridge
+        run: python -m pytest -q "AIGC/项目-01-角色视觉资产/Live2D-开发中/05-Agent接入/test_server.py"
       - name: Extract from ORIGINAL art
         run: |
           python "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/build_cutouts.py" \
