@@ -1,7 +1,7 @@
 name: Test Klika AI avatar runtime
 on:
   push:
-    branches: [feature/live2d-thought-bubbles-v0.1]
+    branches: [main, feature/live2d-detail-inspector-v0.4]
     paths:
       - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/05-Agent接入/**'
       - '.github/workflows/klika-agent-tests.yml'
