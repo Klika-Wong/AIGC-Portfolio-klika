@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Klika · Live2D 图层精修检查器</title>
+<style>
+:root{font:14px/1.55 system-ui,"Microsoft YaHei",sans-serif;color:#25342e;background:#e9eeeb}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:1250px;margin:0 auto;padding:22px}h1{font-size:23px;margin:0 0 6px}h2{font-size:16px;margin:0 0 12px}
+p{margin:5px 0;color:#617369}.tiny{font-size:12px}.muted{color:#68776f}
+.header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px}.tag{border-radius:13px;padding:4px 10px;background:#dbe3dd;font-size:12px}
+.controls{padding:16px;background:#f9fbf8;border:1px solid #cbd4cf;border-radius:17px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:end;margin-bottom:14px}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#4f6157}select,input{font:inherit;border:1px solid #b6c8bc;border-radius:10px;background:white;color:#213b30;padding:8px}
+input[type=range]{width:125px;accent-color:#4e7a63}label.check{flex-direction:row;align-items:center;gap:7px;padding-bottom:7px}
+select{min-width:200px}button{font:inherit;cursor:pointer;background:#355546;border:0;color:white;border-radius:10px;padding:9px 13px}
+button:disabled{background:#9aaca1;cursor:not-allowed}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel{min-width:0;border:1px solid #cbd4cc;background:#fcfdfa;padding:16px;border-radius:18px}
+canvas{display:block;width:100%;height:590px;max-height:75vh;object-fit:contain;border-radius:12px;background:#eef1ef}
+.message{border-left:3px solid #8b9c8f;margin-top:15px;padding:12px 15px;background:#fafcf9;border-radius:0 12px 12px 0;line-height:1.7}
+.warn{color:#8a4e39}.footer{font-size:12px;margin-top:16px;color:#74817a}
+@media(max-width:790px){.panels{grid-template-columns:1fr}canvas{height:430px}}
+</style></head>
+<body><div class="wrap">
+<div class="header"><div><h1>Klika · Live2D 图层精修检查器</h1><p>原图与透明分区按像素一一对齐；不重新生成五官，不冒充已经完成 Cubism 绑定。</p></div><div class="tag">v0.4 · Identity Locked</div></div>
+<div class="controls">
+<label>检查部件<select id="part"></select></label>
+<label>查看倍率 <input id="zoom" type="range" min="1" max="4" step=".25" value="1.5"/><span id="zoomValue">1.5×</span></label>
+<label>透明层强度 <input id="opacity" type="range" min="0" max="100" step="5" value="100"/><span id="opacityValue">100%</span></label>
+<label class="check"><input id="underlay" type="checkbox"/> 在透明部件下叠加淡原图</label>
+<button id="reset">恢复默认</button>
+</div>
+<div class="panels">
+<section class="panel"><h2>原始母版 · 放大同一部位</h2><canvas id="sourceCanvas" width="600" height="680" aria-label="原图细节"></canvas><p class="tiny">只读参考，面部和发型以此为准</p></section>
+<section class="panel"><h2>候选透明分层 · 检查边缘</h2><canvas id="partCanvas" width="600" height="680" aria-label="透明图层细节"></canvas><p class="tiny">棋盘格代表透明像素；当前部件可能带入相邻衣物、头发或皮肤</p></section>
+</div>
+<div id="issue" class="message" role="status" aria-live="polite">正在读取分层清单……</div>
+<div class="footer">说明：本工具只检查图层与原画是否对应。真正的左右眼、眨眼闭合、口腔、头发根部等还要补画并在 Cubism Editor 绑定。无需每次查看和日常运行都启动 Editor。</div>
+</div>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const loaded=new Map();
+const src=new Image(), full=new Image(); 
+const W=1024,H=1536;
+const issues={
+ hair_bangs:"刘海形状与原图一致，但当前候选图还带有额头、眉眼像素；需精确沿发丝拆分并补画被刘海遮住的额头。",
+ hair_back_left:"后发区和手臂外套有交叉，边界不等于最终独立发束。建议细拆成根部、主束和发尾并补绘重叠区。",
+ hair_back_right:"后发区与上臂和外套重合，需隔离实际发丝边界，填补转头时露出的背面。",
+ hair_side_left:"侧发与外套/皮肤穿插；建议分别修左侧面发、细碎发和可摆动的发梢。",
+ hair_side_right:"长发层目前混入手臂和衣服，应该精修根部遮挡、鬓发和发尾。",
+ face_base:"脸底仍含眉眼、口唇和侧发，不可直接把整张脸作为可变形脸底；需补无五官的脸底及隐藏耳侧面。",
+ eye_left_source:"眼部目前只有原画局部截图，尚未分离上眼皮、下眼皮、睫毛、眼白、虹膜、瞳孔、高光与闭眼材质。",
+ eye_right_source:"右眼同样需要可独立形变部件；闭眼时需要补眼睑纹理和眼白覆盖范围。",
+ brows_source:"目前两侧眉连同刘海和额头被一起裁出，应各自独立透明眉毛，并清理发丝压住的地方。",
+ mouth_source:"只有静态口部像素，未有张口的口腔、牙齿、舌头、上下唇和对应关键形。",
+ pendant:"白水晶应保留本色、透明质感，不发光。候选区带入手指和衣服，必须另画完全独立链子和坠子。",
+ bracelet:"右腕黑曜石珠和中间银戒指是身份锚点；候选区仍有手/袖，需要单独修边并保留每颗珠材质。",
+ flip_phone:"旧式翻盖手机不能变成现代触屏手机；裤袋边和机身需分别成层。",
+ small_box:"外套口袋的小盒不能挪位置或替换外观；盒体、口袋前片和遮挡要独立。",
+ jacket_left:"要继续细拆袖子、翻领、门襟、衣摆、布料内侧；遮挡空洞需要补画。",
+ jacket_right:"袖子、翻领、口袋与盒子关系要按原图重建，不能整体作为一块移动。",
+ top:"内搭需独立于手臂、吊坠和头发，补画被外套与手遮住的部位。",
+ pants:"裤子不能整块移动做步态；需要大腿、膝部褶皱、腰带等分区；保留自然曲线。",
+ abdomen:"腰腹必须保持原尺寸，不因重新描画缩腰。",
+ hand_raised:"抬起的手和手串相互遮挡，需要指节、掌心和前后遮挡区；优先不大幅动作。",
+ hand_down:"自然垂下手要保留指形；避免手腕与衣袖断裂。",
+ boot_left:"靴子需要保留鞋头和鞋底安全区，不要因抠图切脚。",
+ boot_right:"与另一只靴子独立，脚踝和裤管需补足。",
+ neck_source:"脖子、吊坠和胸前头发要分开，避免转头时链子粘住脖颈。"
+};
+const labels={
+ hair_back_left:"后发 · 画面左", hair_back_right:"后发 · 画面右", hair_bangs:"刘海 · 重点", 
+ hair_side_left:"侧发 · 画面左",hair_side_right:"侧发 · 画面右",face_base:"脸底候选",
+ eye_left_source:"眼部 · 画面左",eye_right_source:"眼部 · 画面右",brows_source:"眉毛候选",
+ mouth_source:"口部候选",neck_source:"颈部",top:"黑色内搭",jacket_left:"外套 · 画面左",
+ jacket_right:"外套 · 画面右",hand_raised:"抬起的手",hand_down:"自然垂下的手",
+ bracelet:"黑曜石手串",pendant:"白水晶吊坠",abdomen:"腰腹",pants:"裤子",
+ flip_phone:"翻盖手机",small_box:"口袋小盒",boot_left:"靴子 · 画面左",boot_right:"靴子 · 画面右"};
+let parts=[];
+let active=null;
+function image(url){
+ if(loaded.has(url))return loaded.get(url);
+ const obj=new Image();const p=new Promise((resolve,reject)=>{obj.onload=()=>resolve(obj);obj.onerror=()=>reject(Error("图片加载失败: "+url))});
+ obj.src=url;loaded.set(url,p);return p;
+}
+function checker(ctx,w,h){
+ ctx.fillStyle="#f2f4f0";ctx.fillRect(0,0,w,h);
+ const s=22;ctx.fillStyle="#dfe6df";
+ for(let y=0;y<h;y+=s)for(let x=0;x<w;x+=s)if(((x/s+y/s)&1)===0)ctx.fillRect(x,y,s,s);
+}
+function crop(part,zoom){
+ const b=part.bbox||[0,0,W,H];
+ const cx=(b[0]+b[2])/2, cy=(b[1]+b[3])/2;
+ const width=Math.max(b[2]-b[0],45),height=Math.max(b[3]-b[1],40);
+ // preserve the canvas aspect ratio and keep enough surrounding context for comparison
+ let halfX=Math.min(W/2,Math.max(width*0.88,70)/zoom);
+ let halfY=Math.min(H/2,Math.max(height*.88,70)/zoom);
+ const aspect=600/680;
+ if(halfX/halfY<aspect)halfX=halfY*aspect;else halfY=halfX/aspect;
+ halfX=Math.min(halfX,W/2);halfY=Math.min(halfY,H/2);
+ const sx=Math.max(0,Math.min(W-halfX*2,cx-halfX));
+ const sy=Math.max(0,Math.min(H-halfY*2,cy-halfY));
+ return [sx,sy,Math.min(W,halfX*2),Math.min(H,halfY*2)];
+}
+function drawCrop(ctx,im,rect){
+ const [x,y,w,h]=rect;
+ ctx.drawImage(im,x,y,w,h,0,0,ctx.canvas.width,ctx.canvas.height);
+}
+async function render(){
+ if(!active)return;
+ const zoom=Number($("zoom").value);
+ $("zoomValue").textContent=zoom.toFixed(2)+"×";
+ $("opacityValue").textContent=$("opacity").value+"%";
+ const a=$("sourceCanvas").getContext("2d"),b=$("partCanvas").getContext("2d");
+ checker(a,600,680);checker(b,600,680);
+ const region=crop(active,zoom);
+ drawCrop(a,src,region);
+ if($("underlay").checked){
+   b.globalAlpha=.22;drawCrop(b,src,region);b.globalAlpha=1;
+ }
+ b.globalAlpha=Number($("opacity").value)/100;
+ try{
+  const im=await image("/assets/"+active.file);
+  if(active!==parts.find(x=>x.name===$("part").value))return;
+  drawCrop(b,im,region);
+ }catch(e){$("issue").textContent=e.message}
+ b.globalAlpha=1;
+ const px=(active.bbox||[]).join(", ");
+ $("issue").textContent=(labels[active.name]||active.name)+" ｜ 像素包围框："+px+"。\n"+(issues[active.name]||"只是一张来自原画的透明参考区域，尚待修边、补绘遮挡和真实 Live2D 绑定。");
+}
+async function setup(){
+ try{
+   const [manifest,raw]=await Promise.all([
+      fetch("/assets/manifest.json").then(r=>{if(!r.ok)throw Error("缺少 manifest.json");return r.json()}),
+      image("/source/identity")
+   ]);
+   src.src=raw.src;
+   // manifest generated by the original pipeline uses parts:[{name,file,bbox}]
+   parts=(manifest.parts||manifest.layers||[]).map(v=>({name:v.name||v.id,file:v.file||v.path,bbox:v.bbox}));
+   if(!parts.length)throw Error("未找到可用部件清单");
+   for(const p of parts){
+      const opt=document.createElement("option");opt.value=p.name;opt.textContent=labels[p.name]||p.name;$("part").appendChild(opt);
+   }
+   $("part").value=parts.some(p=>p.name==="hair_bangs")?"hair_bangs":parts[0].name;
+   active=parts.find(p=>p.name===$("part").value);
+   await render();
+ }catch(e){$("issue").textContent="无法启动检查器："+e.message+"。请从本地 AI 助手的 /review 页面打开，而不是直接双击 HTML。"}
+}
+$("part").onchange=()=>{active=parts.find(p=>p.name===$("part").value);render()};
+for(const id of ["zoom","opacity","underlay"])$(id).oninput=render;
+$("reset").onclick=()=>{$("zoom").value="1.5";$("opacity").value="100";$("underlay").checked=false;render()};
+setup();
+</script></body></html>
