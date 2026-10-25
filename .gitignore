@@ -1,14 +1,12 @@
-# Operating system files
+# Operating system / editor
 .DS_Store
 Thumbs.db
 Desktop.ini
-
-# Editor and IDE files
 .vscode/
 .idea/
 *.swp
 
-# Generated exports and temporary files
+# Temporary & build outputs
 dist/
 build/
 tmp/
@@ -16,21 +14,27 @@ temp/
 *.tmp
 *.bak
 *.log
+__pycache__/
+*.py[cod]
+.venv/
 
-# Local secrets and environment files
+# Secrets and local environment (not a substitute for secret scanning)
 .env
 .env.*
 !.env.example
-记忆/
-**/记忆/
 *.pem
 *.key
 *.p12
 *.pfx
-.env
-.env.*
-!.env.example
+**/secrets/
+**/private-rights-evidence/
+**/legal-evidence-local/
+**/个人授权证明/
+**/记忆/
+记忆/
+**/private-dialogue-exports/
+**/publication-staging/
 
-# Python cache, if helper scripts are added later
-__pycache__/
-*.py[cod]
+# Do not add ignore rules for source art, reviewed output/ PNG, or ORA:
+# those are private tracked versioned assets with explicit provenance.
+# Ignore rules NEVER remove data from existing Git history or Actions artifacts.
