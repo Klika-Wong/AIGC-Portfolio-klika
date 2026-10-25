@@ -61,3 +61,21 @@ def test_chat_serious_suppresses_model_aside(monkeypatch):
     response = client.post("/api/chat",json={"message":"认真事","context_safety":"serious"})
     assert response.status_code == 200
     assert response.json()["event"]["aside"] is None
+
+
+def test_integrated_detail_inspector():
+    result = client.get("/review")
+    assert result.status_code == 200
+    assert "图层精修检查器" in result.text
+    assert 'id="sourceCanvas"' in result.text
+    assert 'id="partCanvas"' in result.text
+
+def test_identity_reference_served_from_original_art():
+    result = client.get("/source/identity")
+    assert result.status_code == 200
+    assert result.headers["content-type"].startswith("image/png")
+
+def test_status_exposes_reference_cutout_url():
+    result = client.get("/api/status")
+    assert result.status_code == 200
+    assert result.json()["subject_url"].startswith("/assets/00_subject_cutout")
