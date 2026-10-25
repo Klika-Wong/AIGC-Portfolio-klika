@@ -19,6 +19,7 @@
 - [x] `06-精修检查/inspector.html`：应用内打开 `http://127.0.0.1:8765/review`；逐个选择 24 个透明部件，左右对比原画，支持放大、透明度调节与原画底图叠加。
 - [x] 质量脚本 `06-精修检查/audit_parts.py`：自动确认候选图尺寸及来源颜色一致性，记录所有重叠分区，修复头顶极小透明穿孔（只调整 alpha，不重画面部 RGB）。
 - [x] 新结果：`04-资产生成/output/00_subject_cutout_refined.png`、`04_quality_audit.json`、`04_face_detail_audit.png`。
+- [x] 额外保留 `05_front_hair_isolation_candidate.png`：依据原图像素手动限定区域后再提取的较窄刘海候选，减少旧分区混入眉眼；**仍需逐发丝抠边、填充遮挡**。
 - [x] 将检查器整合进已有 AI 助手页面，**不需打开 Cubism Editor 就能质检美术**。
 - [x] 软件制作与运行区分见 [EDITOR_VS_RUNTIME.md](06-精修检查/EDITOR_VS_RUNTIME.md)。
 
