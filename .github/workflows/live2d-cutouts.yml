@@ -1,12 +1,7 @@
 name: Build Live2D reference cutouts
+# Private original artwork: execute only on explicit owner workflow_dispatch.
+# This uses a GitHub-hosted runner and is NOT offline processing.
 on:
-  push:
-    branches: [main, feature/live2d-detail-inspector-v0.4]
-    paths:
-      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/build_cutouts.py'
-      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/audit_parts.py'
-      - 'AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/refine_front_hair.py'
-      - '.github/workflows/live2d-cutouts.yml'
   workflow_dispatch:
 
 concurrency:
@@ -48,13 +43,7 @@ jobs:
           python "AIGC/项目-01-角色视觉资产/Live2D-开发中/06-精修检查/refine_front_hair.py" \
             --source "AIGC/项目-01-角色视觉资产/人物设定-1/人设图.png" \
             --assets "AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output"
-      - name: Upload asset package (works even if push is blocked)
-        uses: actions/upload-artifact@v4
-        with:
-          name: klika-live2d-reference-cutouts
-          path: AIGC/项目-01-角色视觉资产/Live2D-开发中/04-资产生成/output/
-          retention-days: 30
-      - name: Commit candidate PNGs to the feature branch
+      - name: Commit candidate PNGs to the explicitly selected branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
