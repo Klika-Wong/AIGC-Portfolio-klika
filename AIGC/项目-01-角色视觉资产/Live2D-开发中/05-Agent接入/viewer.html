@@ -95,7 +95,7 @@ async function loadLive2D(url){
 async function init(){
  try{
   const state=await (await fetch("/api/status")).json();
-  if(!state.parts_available){portrait.src="/assets/../00_subject_cutout.png";log.textContent="没有检测到透明人物素材，请先生成资产。"}
+  if(!state.parts_available){portrait.style.display="none";log.textContent="没有检测到透明人物素材，请先生成资产。"}
   if(state.model_url){try{await loadLive2D(state.model_url)}catch(e){log.textContent="Live2D 模型未能加载，使用原图预览："+e.message}}
   else{statusNode.textContent="原图预览（尚未绑定 Cubism）"}
  }catch(e){log.textContent="服务端状态读取失败："+e.message}
