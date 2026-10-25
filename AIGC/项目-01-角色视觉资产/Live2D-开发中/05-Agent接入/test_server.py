@@ -35,3 +35,29 @@ def test_reject_long_aside():
 
 def test_path_traversal_not_exposed():
     assert client.get("/assets/../../README.md").status_code in (404,400)
+
+def test_chat_requires_user_key(monkeypatch):
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    response = client.post("/api/chat", json={"message":"你好"})
+    assert response.status_code == 503
+
+def test_chat_mocked_without_real_api_call(monkeypatch):
+    import deepseek_client
+    monkeypatch.setenv("DEEPSEEK_API_KEY","test-not-a-real-key")
+    async def fake_generate(message, allow_aside=True, serious=False):
+        return {"reply": "好的，我来处理。", "aside": {"text": "有点意思。", "expression": "tease_smile"}}
+    monkeypatch.setattr(deepseek_client, "generate", fake_generate)
+    response = client.post("/api/chat",json={"message":"你好","allow_aside":True})
+    assert response.status_code == 200
+    assert response.json()["event"]["reply"] == "好的，我来处理。"
+    assert response.json()["event"]["aside"]["text"] == "有点意思。"
+
+def test_chat_serious_suppresses_model_aside(monkeypatch):
+    import deepseek_client
+    monkeypatch.setenv("DEEPSEEK_API_KEY","test-not-a-real-key")
+    async def fake_generate(message, allow_aside=True, serious=False):
+        return {"reply": "认真处理。", "aside": {"text": "这不该显示。"}}
+    monkeypatch.setattr(deepseek_client, "generate", fake_generate)
+    response = client.post("/api/chat",json={"message":"认真事","context_safety":"serious"})
+    assert response.status_code == 200
+    assert response.json()["event"]["aside"] is None
