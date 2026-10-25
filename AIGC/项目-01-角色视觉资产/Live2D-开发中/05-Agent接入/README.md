@@ -1,85 +1,79 @@
-# Klika 原创数字人 · Agent 接入模块
+# 私人数字人 · Live2D 展示与 Agent 接入（开发版）
 
-> **现在可以运行本地预览并接收 AI 消息**。当前展示的是从原始角色图提取的透明静态人物；只有把 Cubism Editor 正式导出的模型放入 `model/` 并配好运行库后，才会切换为真实 Live2D 模型。不要误报已完成绑定。
+本模块**仅供项目所有者的本地研发与验证**。目前可以显示从原始人设图导出的透明人物、接收 HTTP/WebSocket 消息、检查面部分层；**还没有真实的 Live2D Cubism 模型**，不能称作已完成的动画绑定。
 
-## 1. 本地立即运行
+## 1. 本地启动
 
-在仓库克隆后的 `05-Agent接入/` 文件夹中打开命令行：
+在已克隆的私人仓库内：
 
-```bash
+```powershell
+cd "AIGC/项目-01-角色视觉资产/Live2D-开发中/05-Agent接入"
 python -m pip install -r requirements.txt
 python -m uvicorn server:app --host 127.0.0.1 --port 8765
 ```
 
-打开 `http://127.0.0.1:8765/`。界面会使用同仓库自动生成的 `04-资产生成/output/00_subject_cutout.png`，展示角色并连接本地 WebSocket。
+浏览器访问 `http://127.0.0.1:8765/`（角色展示）、`/review`（24 个全身分区）或 `/face-review`（13 个面部候选层）。所有图片来自此私人仓库的本地副本，不自动成为开放发布素材。
 
-界面的按钮可演示普通回复和带气泡的回复。按钮是**人为演示**；正式运行时只有 Agent 自己决定给出非空 `aside` 才会出现气泡。
+现有测试只证明部分路由、消息、素材读取和页面能正常工作。模拟眼球移动/图片上下漂移不等于完成 Live2D Rig。
 
-## 1B. 直接连接 DeepSeek 对话（可选）
+## 2. 数据流与安全边界
 
-不必改源代码。用户在自己的电脑上设置 API 密钥后启动同一个服务器，就能在预览网页的输入框里真实对话。
+| 组件 | 实际行为 | 风险控制 |
+| --- | --- | --- |
+| 原始图片及 PNG/ORA | 本机服务读取本地仓库目录 | 防止暴露公网上的文件路由；仅监听 loopback |
+| `POST /api/events` | 本机代理发送角色答复、情绪和可选 `aside` | **当前没有认证**；同机其他进程可能调用 |
+| `WebSocket /ws` | 发送角色显示事件；有同源检查 | 同源检查不是用户账户认证 |
+| DeepSeek API | **可选**，配置 Key 后将对话文本发送到第三方服务 | 由所有者明确开启并核对隐私/费用政策 |
+| Web Live2D 播放器 | 仅当检测到模型入口文件时，尝试从公共 CDN 获取 PixiJS 与 pixi-live2d-display | 当前不适合宣称“严格离线”；发行前改为本地固定依赖并核查许可 |
+| 官方 Cubism Core | 需用户依许可证自行取得并安装 | 仓库当前不捆绑专有 Core，切勿无授权再分发 |
 
-Windows PowerShell（仅当前终端有效，请勿把密钥放到仓库中）：
+**Private GitHub 仓库 ≠ 本地离线应用。** 本地不录音，也不意味着允许将私人聊天或源图直接发送云模型做测试。接入外部 API 前应明确使用方式和隐私条件。
 
-```powershell
-$env:DEEPSEEK_API_KEY = "填入你自己的 DeepSeek API Key"
-$env:DEEPSEEK_MODEL = "deepseek-flash"
-python -m uvicorn server:app --host 127.0.0.1 --port 8765
-```
+## 3. 向现有私人助手发布事件
 
-API 以 JSON 模式生成 `{"reply":"...","aside":null}` 或带有自然轻吐槽的可选 `aside`。模型决定是否产生气泡，前端默认不显示；认真/隐私模式强制禁用气泡。不请求、不显示模型的推理链。`deepseek_client.py` 默认使用官方 `https://api.deepseek.com/chat/completions`，模型 ID 和计费方式可能随服务更新，请参考 https://api-docs.deepseek.com/api/create-chat-completion/ 。
-
-**使用 DeepSeek API 会向该服务发送你在输入框中输入的文字，可能产生 API 费用**。不设置 API Key 时，仍能使用离线透明人物预览和本机事件总线。仓库没有、也不应该保存你的 API Key。
-
-## 2. 给私人 AI 助手接入
-
-Agent 每条有效输出后，将结果发送到本机 HTTP 入口：
+下面的本机事件接口仅是 UI 桥接；主 LLM 或外部行为模型可自行决定是否生成轻吐槽字段。
 
 ```python
 import requests
-payload = {
+event = {
   "type": "assistant.reply",
-  "reply": "我已经把项目整理好了。",
-  "aside": None,  # 由模型自主决定，默认为 None
-  "expression": "neutral",
+  "reply": "资料已经整理好了。",
+  "aside": None,
   "context_safety": "normal",
-  "audio_level": 0.0
+  "expression": "neutral",
+  "audio_level": 0
 }
-requests.post("http://127.0.0.1:8765/api/events", json=payload, timeout=3).raise_for_status()
+requests.post("http://127.0.0.1:8765/api/events", json=event, timeout=3).raise_for_status()
 ```
 
-如果模型认为适合轻吐槽，可自选短句：
+正式情境下 `aside` 默认 `null`，由上游模型在语境确实合适且非隐私/严肃话题时提供简短的表演文本；不能公开模型内部推理、系统提示、私人资料或 API Key。服务端保留长度和场景验证，**尚不等于全面安全过滤**。
 
-```json
-{"type":"assistant.reply","reply":"已经完成了。","aside":{"text":"这一版总算顺眼了。","expression":"tease_smile"},"context_safety":"normal"}
+## 4. 可选云对话
+
+若要用已有 DeepSeek 适配器进行实验，**仅在拥有相关服务协议和隐私接受条件后**，于当前 PowerShell 会话设置：
+
+```powershell
+$env:DEEPSEEK_API_KEY = "<本人私下设置，不填入 Git>"
+$env:DEEPSEEK_MODEL = "<在当前服务商文档中确认的可用模型 ID>"
+python -m uvicorn server:app --host 127.0.0.1 --port 8765
 ```
 
-不要把大模型的隐藏思维链、系统提示或用户私人资料作为 aside；它是人物**表演性文本**。后端会按长度与安全级别过滤，前端还有主动关闭开关。复杂的内容审核应在 Agent 一侧完成。
+未配置 Key 时本地人物/事件演示仍可使用；配置后会将提交给 `/api/chat` 的输入内容发往 `https://api.deepseek.com/chat/completions`，可能产生费用。**当前未完成真实付费 API 端到端验收**，模型 ID 和 JSON 返回能力要以服务商现行文档为准。
 
-发声口型预留：按时间节奏发送 `{"type":"avatar.audio_level","audio_level":0.45}`，有真实 Cubism 模型后尝试写入 `ParamMouthOpenY`。最终应按 TTS 音素/音频幅度同步并在具体 Cubism 模型上校准。
+## 5. 日后接入真正 Cubism 模型
 
-## 3. 将来真正装入 Cubism 模型
+先把面部、头发、衣服精修成可以绑定的 PSD，使用 Cubism Editor 制作 ArtMesh、Deformer、参数关键形和物理；然后将按正式导出路径保存的 `.model3.json`、`.moc3`、贴图与表情/动作完整放入本目录 `model/`。
 
-完成美术补绘、PSD 拆层与 Cubism Editor 的 Mesh/Deformer/Physics/Expression 后，将 **从 Editor 正式导出的整套模型目录**复制到：
+按许可从官方 SDK 安装 `vendor/live2dcubismcore.min.js`。适配器与 Pixi 等库的许可、远程脚本、本地部署与发布条件需另查；**自动发现 .model3.json 只能表示文件存在，不能保证渲染成功或取得再分发授权**。
 
-```05-Agent接入/model/
-  character.model3.json
-  model.moc3
-  textures/...
-  expressions/...
-  motions/...
-  physics3.json  (若导出)
-```
+特别注意：私人研发可先验证技术能力；**公开应用、SDK 分发、可扩展的数字人/avatar 平台可能涉及 Live2D 的额外发表许可或专门审批**。不要按“个人项目就永远免费、可发行”的方式推断。参见 [官方 SDK License](https://www.live2d.com/en/sdk/license/)。
 
-资源路径必须与 `.model3.json` 中的相对引用一致；`model.moc3` 等名称仅是举例。
+## 6. 发布前须补齐
 
-还需从官方 Cubism SDK 取得并按许可放置 `05-Agent接入/vendor/live2dcubismcore.min.js`。本项目不捆绑 Live2D 专有运行库。网页需要访问 PixiJS 6 和 pixi-live2d-display（当前 CDN 引入）；生产应锁定版本并自行托管所需文件。有关插件与 Cubism Core 的使用见 https://github.com/guansss/pixi-live2d-display 。
+- [ ] 独立于私有仓库的访问鉴权、网络边界和日志脱敏。
+- [ ] 固定并自托管所有可合法分发的第三方 JS；加入 CSP/供应链核验。
+- [ ] 确认云 API 数据使用、保存与费用条款；不上传私人人设图片做无必要调用。
+- [ ] 原图、参考与派生素材的实际权利核查及去隐私元数据的**发布副本**。
+- [ ] 真正完成 Cubism 导出、口型/眼球/物理测试，并确认 SDK 最终发布许可。
 
-接口 `GET /api/status` 能区分 `reference_preview` 和 `cubism`。注意状态 `cubism` 只表示存在入口文件，网页要真正加载成功才能显示模型。
-
-## 4. 边界与安全
-
-- **仅监听本机回环地址** `127.0.0.1`；不允许直接暴露公网，公网部署要增加鉴权、TLS、限流等。
-- 禁止把 API Key、私人记忆或用户聊天内容作为模型资源公开上传。
-- 此包不修改原始人设；提取过程由 `04-资产生成/build_cutouts.py` 重复生成。
-- 暂无正经 `.moc3`：静态预览和预留口型参数不等于现有模型已经能张嘴。
+合规依据：[私人资产政策](../../../../PRIVATE_ASSETS.md) · [审查记录](../../ASSET_COMPLIANCE_REVIEW.md)。本文件不是软件许可证或法律意见。
